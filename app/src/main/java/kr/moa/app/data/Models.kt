@@ -16,6 +16,14 @@ data class Performance(
 @Serializable data class Manifest(val version: String, val updatedAt: String, val files: List<String>, val source: String = "KOPIS", val count: Int = 0)
 @Serializable data class Catalog(val updatedAt: String, val performances: List<Performance>, val sample: Boolean = false)
 
+fun dateLabel(p: Performance): String {
+    if (p.startDate.isBlank() || p.endDate.isBlank()) return "일정 정보 없음"
+    val start = p.startDate.replace('-', '.')
+    if (p.startDate == p.endDate) return start
+    val end = if (p.startDate.take(4) == p.endDate.take(4) && p.endDate.length >= 10) p.endDate.substring(5) else p.endDate
+    return "$start — ${end.replace('-', '.')}"
+}
+
 val genres = listOf("콘서트", "뮤지컬", "연극", "클래식", "국악", "무용", "서커스/마술", "복합", "축제")
 val regions = listOf("전국", "서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종", "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주")
 

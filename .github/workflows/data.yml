@@ -26,7 +26,9 @@ jobs:
         run: python -m unittest discover -s tools/tests -v
       - uses: actions/cache/restore@v4
         with:
-          path: public
+          path: |
+            public
+            .kopis-cache
           key: kopis-v3-${{ github.run_id }}
           restore-keys: kopis-v3-
       - name: Collect and validate
@@ -34,8 +36,11 @@ jobs:
           KOPIS_API_KEY: ${{ secrets.KOPIS_API_KEY }}
         run: python tools/collect.py --output public --months 6
       - uses: actions/cache/save@v4
+        if: always()
         with:
-          path: public
+          path: |
+            public
+            .kopis-cache
           key: kopis-v3-${{ github.run_id }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

@@ -125,4 +125,18 @@ class CollectorTests(unittest.TestCase):
         self.assertEqual(request.call_count, 4)
         self.assertTrue(all(call.kwargs['afterdate'] == '20261012' for call in request.call_args_list))
 
+    def test_checkpoint_resumes_validated_details_after_interrupted_run(self):
+        item = collect.normalize(self.fixture(), self.fixture())
+        root = ET.Element('dbs'); root.append(self.fixture())
+        with tempfile.TemporaryDirectory() as tmp:
+            checkpoint = Path(tmp)
+            with patch.object(collect, 'request', return_value=root):
+                collect.collect_items('fake', {item['id']: self.fixture()}, {}, set(), True, checkpoint)
+            self.assertTrue((checkpoint / f"{item['id']}.json").exists())
+            with patch.object(collect, 'request') as request:
+                items, count = collect.collect_items('fake', {item['id']: self.fixture()}, {}, set(), True, checkpoint)
+            request.assert_not_called()
+            self.assertEqual(items, [item])
+            self.assertEqual(count, 0)
+
 if __name__ == '__main__': unittest.main()

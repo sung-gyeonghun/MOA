@@ -87,7 +87,17 @@ class MoaRepository @Inject constructor(
         val saved = dao.catalog().mapNotNull { runCatching { json.decodeFromString<Performance>(it.payload) }.getOrNull() }
         val prefs = preferences.first()
         val metadata = dao.metadata()
-        if (saved.isNotEmpty()) Catalog(metadata?.updatedAt ?: prefs.updatedAt, saved, metadata?.sample ?: prefs.sample) else json.decodeFromString(context.assets.open("sample_catalog.json").bufferedReader().use { it.readText() })
+        if (saved.isNotEmpty()) {
+            Catalog(metadata?.updatedAt ?: prefs.updatedAt, saved, metadata?.sample ?: prefs.sample)
+        } else if (BuildConfig.DEBUG) {
+            json.decodeFromString(context.assets.open("sample_catalog.json").bufferedReader().use { it.readText() })
+        } else {
+            val bundled = runCatching { context.assets.open("bootstrap_catalog.json").bufferedReader().use { json.decodeFromString<Catalog>(it.readText()) } }.getOrNull()
+            if (bundled != null && bundled.performances.isNotEmpty() && !bundled.sample) {
+                dao.replaceCatalog(bundled.performances.map { CachedPerformance(it.id, json.encodeToString(it)) }, CatalogMetadata(updatedAt = bundled.updatedAt))
+                bundled
+            } else Catalog("", emptyList(), false)
+        }
     }
     suspend fun refresh(endpoint: String): Catalog = withContext(Dispatchers.IO) {
         require(endpoint.startsWith("https://") && URI(endpoint).host != null) { "HTTPS 데이터 주소를 입력해주세요." }

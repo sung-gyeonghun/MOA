@@ -54,7 +54,7 @@ val Pink = Color(0xFFFFD8E5)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) { super.onCreate(savedInstanceState); enableEdgeToEdge(); setContent {
-        MaterialTheme(colorScheme = lightColorScheme(primary = Purple, onPrimary = Color.White, background = Canvas, surface = Canvas, onSurface = Ink, secondaryContainer = Lavender, outline = Color(0xFFE8E2F0))) { MoaApp() }
+        MaterialTheme(typography = moaTypography(), colorScheme = lightColorScheme(primary = Purple, onPrimary = Color.White, background = Canvas, surface = Canvas, onSurface = Ink, secondaryContainer = Lavender, outline = Color(0xFFE8E2F0))) { MoaApp() }
     } }
 }
 
@@ -117,6 +117,7 @@ class MainActivity : ComponentActivity() {
 @Composable fun HomeScreen(catalog: Catalog?, filters: Filters, favorites: List<Performance>, busy: Boolean, onFilter: () -> Unit, onSearch: () -> Unit, change: (Filters) -> Unit, favorite: (Performance) -> Unit, open: (Performance) -> Unit, refresh: () -> Unit) {
     val all = catalog?.performances.orEmpty()
     val list = remember(all, filters) { filterPerformances(all, "", filters) }
+    val upcoming = list.filter { it.startDate >= LocalDate.now().toString() }.ifEmpty { list }
     LazyColumn(verticalArrangement = Arrangement.spacedBy(14.dp), contentPadding = PaddingValues(bottom = 24.dp)) {
         item { BrandHeader(filters.region, onFilter) }
         item { Column(Modifier.fillMaxWidth().background(Brush.linearGradient(listOf(Canvas, Color(0xFFF3EAFE), Color(0xFFFFF2F6)))).padding(horizontal = 24.dp, vertical = 14.dp)) {
@@ -133,7 +134,7 @@ class MainActivity : ComponentActivity() {
         if (catalog == null) item { Box(Modifier.fillMaxWidth().padding(40.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() } }
         else if (list.isEmpty()) item { EmptyState("아직 만날 공연이 없어요", "지역이나 날짜를 바꾸면 다른 무대를 찾을 수 있어요.") }
         else {
-            item { LazyRow(contentPadding = PaddingValues(horizontal = 22.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) { items(list.take(8), key = { it.id }) { p -> PosterCard(p, favorites.any { it.id == p.id }, { favorite(p) }, { open(p) }) } } }
+            item { LazyRow(contentPadding = PaddingValues(horizontal = 22.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) { items(upcoming.take(8), key = { it.id }) { p -> PosterCard(p, favorites.any { it.id == p.id }, { favorite(p) }, { open(p) }) } } }
             item { Column(Modifier.padding(horizontal = 22.dp)) { SectionTitle("모든 공연 둘러보기", "마음에 드는 무대를 찜해보세요", if (filters.descending) "종료일순 ↕" else "시작일순 ↕") { change(filters.copy(descending = !filters.descending)) } } }
             items(list, key = { it.id }) { p -> PerformanceRow(p, favorites.any { it.id == p.id }, { favorite(p) }, { open(p) }, Modifier.padding(horizontal = 22.dp)) }
         }
@@ -149,7 +150,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 @Composable fun Heart(saved: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) { Surface(shape = RoundedCornerShape(50), color = Color.White.copy(alpha = .94f), modifier = modifier) { IconButton(onClick = onClick, modifier = Modifier.size(48.dp)) { Icon(if (saved) Icons.Rounded.Favorite else Icons.Outlined.FavoriteBorder, if (saved) "찜 해제" else "찜하기", tint = if (saved) Color(0xFFD76B95) else Muted, modifier = Modifier.size(23.dp)) } } }
-fun dateLabel(p: Performance): String = p.startDate.replace('-', '.') + if (p.startDate == p.endDate) "" else " — " + p.endDate.substring(5).replace('-', '.')
 
 @Composable fun PosterArt(p: Performance, modifier: Modifier = Modifier) {
     val palette = when (p.artwork) {

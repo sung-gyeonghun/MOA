@@ -25,7 +25,7 @@ class MoaViewModel @Inject constructor(private val repository: MoaRepository) : 
         viewModelScope.launch {
             try {
                 val url = repository.preferences.first().endpoint
-                if (url.isBlank()) { message.value = "설정에서 데이터 주소를 연결해주세요. 현재는 디자인 체험 데이터입니다."; return@launch }
+                if (url.isBlank()) { message.value = "설정에서 공연 데이터 주소를 연결해주세요."; return@launch }
                 catalog.value = repository.refresh(url)
                 message.value = "새로운 공연 정보를 불러왔어요."
             } catch (cancelled: CancellationException) { throw cancelled

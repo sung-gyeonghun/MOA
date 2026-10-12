@@ -26,7 +26,7 @@ GENRE_CODES = {"연극": "AAAA", "뮤지컬": "GGGA", "서양음악(클래식)":
 def request(path: str, key: str, **params) -> ET.Element:
     # Never log the URL: it contains the service key.
     url = BASE + path + "?" + urlencode({"service": key, **params})
-    for attempt in range(3):
+    for attempt in range(6):
         try:
             with urlopen(url, timeout=40) as response:
                 result = ET.fromstring(response.read())
@@ -35,11 +35,11 @@ def request(path: str, key: str, **params) -> ET.Element:
             time.sleep(.15)
             return result
         except Exception as error:
-            if attempt == 2:
+            if attempt == 5:
                 status = getattr(error, "code", None)
                 category = f"HTTP {status}" if isinstance(status, int) else type(error).__name__
                 raise RuntimeError(f"KOPIS request failed for {path} ({category}); previous publication retained") from None
-            time.sleep(2 ** attempt)
+            time.sleep(min(2 ** (attempt + 1), 30))
     raise AssertionError("unreachable")
 
 def field(node: ET.Element, name: str, fallback: str = "") -> str:
@@ -189,7 +189,22 @@ def summary_matches(item: dict, summary: ET.Element):
     }
     return all(not value or item.get(name) == value for name, value in expected.items())
 
-def collect_items(key, summaries, previous, changed, full):
+def read_checkpoint(directory: Path | None, identity: str, summary: ET.Element):
+    if directory is None:
+        return None
+    try:
+        record = json.loads((directory / f"{identity}.json").read_text(encoding="utf-8"))
+        fetched = datetime.fromisoformat(record["fetchedAt"])
+        if datetime.now(ZoneInfo("Asia/Seoul")) - fetched > timedelta(hours=3):
+            return None
+        validate(record["item"])
+        if record["item"]["id"] != identity or not summary_matches(record["item"], summary):
+            return None
+        return record["item"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+
+def collect_items(key, summaries, previous, changed, full, checkpoint: Path | None = None):
     items = []
     refreshed = 0
     for identity, summary in summaries.items():
@@ -197,6 +212,10 @@ def collect_items(key, summaries, previous, changed, full):
         if not full and cached and identity not in changed and summary_matches(cached, summary):
             items.append(cached)
         else:
+            resumed = read_checkpoint(checkpoint, identity, summary)
+            if resumed:
+                items.append(resumed)
+                continue
             detail = request("pblprfr/" + identity, key).find("db")
             if detail is None:
                 raise ValueError("Missing detail; collection cancelled")
@@ -204,6 +223,11 @@ def collect_items(key, summaries, previous, changed, full):
             if item["id"] != identity:
                 raise ValueError("Detail identity mismatch; collection cancelled")
             items.append(item)
+            if checkpoint is not None:
+                checkpoint.mkdir(parents=True, exist_ok=True)
+                temporary = checkpoint / f"{identity}.tmp"
+                write_json(temporary, {"fetchedAt": datetime.now(ZoneInfo("Asia/Seoul")).isoformat(), "item": item})
+                temporary.replace(checkpoint / f"{identity}.json")
             refreshed += 1
             if refreshed % 100 == 0:
                 print(f"Refreshed {refreshed} details", flush=True)
@@ -214,6 +238,7 @@ def main():
     parser.add_argument("--output", type=Path, default=Path("public"))
     parser.add_argument("--months", type=int, default=6)
     parser.add_argument("--full", action="store_true", help="Force complete detail refresh")
+    parser.add_argument("--checkpoint-dir", type=Path, default=Path(".kopis-cache"))
     args = parser.parse_args()
     if not 1 <= args.months <= 12:
         parser.error("months must be 1..12")
@@ -231,7 +256,7 @@ def main():
     if not full:
         since = datetime.fromisoformat(previous_manifest["updatedAt"]).date() - timedelta(days=1)
         changed = set(fetch_summaries(key, today, args.months, f"{since:%Y%m%d}"))
-    items, refreshed = collect_items(key, summaries, previous, changed, full)
+    items, refreshed = collect_items(key, summaries, previous, changed, full, args.checkpoint_dir)
     print(f"Mode: {'full' if full else 'incremental'}; refreshed {refreshed}, reused {len(items)-refreshed}")
     updated = datetime.now(ZoneInfo("Asia/Seoul")).isoformat(timespec="seconds")
     args.output.parent.mkdir(parents=True, exist_ok=True)

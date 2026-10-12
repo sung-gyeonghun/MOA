@@ -11,3 +11,4 @@ tools/emulator*.log
 public/
 tools/ui.xml
 dist/
+.kopis-cache/
