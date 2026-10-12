@@ -45,7 +45,7 @@ python tools/validate_snapshot.py public
 
 Android Studio에서도 프로젝트를 열 수 있습니다. JDK 17 이상과 Android SDK 35가 필요합니다.
 
-검증: Kotlin 테스트 5개, Python 테스트 16개, Android 에뮬레이터 테스트 12개 통과. 실제 공연 상세·찜·프로세스 종료 후 유지·오프라인 목록과 공개 JSON 파일의 해시를 추가 확인했습니다. 실제 Android 기기와 Android 10 기기 시험은 아직 하지 않았습니다.
+검증: Kotlin 테스트 5개, Python 테스트 16개, Android 에뮬레이터 테스트 12개 통과. 실제 공연 상세·찜·프로세스 종료 후 유지·오프라인 목록과 공개 JSON 파일의 해시를 추가 확인했습니다. Android 10(API 29) 에뮬레이터에서도 Android 테스트 12개와 실제 데이터 APK의 온라인·오프라인 표시를 확인했습니다. 실제 Android 휴대폰 시험은 아직 하지 않았습니다.
 
 `docs/verification`에 테스트 XML·배포·실제 데이터·기기 확인 및 파일 SHA256 기록이 있습니다. `docs/screenshots`에 실제 공연 데이터로 캡처한 화면이 있습니다.
 

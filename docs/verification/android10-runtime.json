@@ -1,0 +1,11 @@
+{
+  "apiLevel": 29,
+  "androidVersion": "10",
+  "device": "Moa_Android10 emulator",
+  "instrumentationTestsPassed": 12,
+  "previewInstalled": true,
+  "actualCatalogCount": 2934,
+  "offlineProcessRestartVerified": true,
+  "appRuntimeErrors": 0,
+  "screenshot": "../screenshots/android10-home.png"
+}
