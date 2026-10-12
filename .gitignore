@@ -1,0 +1,13 @@
+.gradle/
+**/build/
+local.properties
+.idea/
+*.jks
+*.keystore
+__pycache__/
+.env
+tools/staging/
+tools/emulator*.log
+public/
+tools/ui.xml
+dist/

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>모아 (MOA) - 검색</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Plus Jakarta Sans & Noto Sans KR -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-container": "#fffbff",
+            "on-surface-variant": "#484553",
+            "on-tertiary": "#ffffff",
+            "inverse-primary": "#c8bfff",
+            "tertiary-fixed-dim": "#c8c4d6",
+            "secondary-fixed-dim": "#efb7ca",
+            "tertiary-container": "#757382",
+            "on-tertiary-fixed-variant": "#474553",
+            "outline-variant": "#c9c4d6",
+            "on-primary-fixed": "#1a0063",
+            "on-secondary-container": "#7a4f5f",
+            "on-error": "#ffffff",
+            "primary-fixed-dim": "#c8bfff",
+            "inverse-on-surface": "#f5eeff",
+            "on-primary-container": "#fffbff",
+            "secondary": "#7e5262",
+            "tertiary-fixed": "#e4e0f2",
+            "inverse-surface": "#322d45",
+            "secondary-container": "#fec5d8",
+            "surface-dim": "#ded6f4",
+            "primary": "#5b46c5",
+            "surface-variant": "#e7defd",
+            "surface": "#fdf7ff",
+            "on-primary": "#ffffff",
+            "on-surface": "#1d182f",
+            "on-secondary-fixed": "#31101e",
+            "surface-container-highest": "#e7defd",
+            "error-container": "#ffdad6",
+            "tertiary": "#5c5a69",
+            "on-primary-fixed-variant": "#452daf",
+            "on-secondary": "#ffffff",
+            "primary-fixed": "#e5deff",
+            "surface-tint": "#5e49c8",
+            "surface-bright": "#fdf7ff",
+            "error": "#ba1a1a",
+            "surface-container-low": "#f8f1ff",
+            "on-secondary-fixed-variant": "#633b4a",
+            "outline": "#797585",
+            "background": "#fdf7ff",
+            "surface-container-lowest": "#ffffff",
+            "primary-container": "#7461e0",
+            "on-error-container": "#93000a",
+            "secondary-fixed": "#ffd9e4",
+            "on-tertiary-fixed": "#1b1a27",
+            "on-background": "#1d182f",
+            "surface-container-high": "#ede4ff",
+            "surface-container": "#f2ebff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-md": "1rem",
+            "gutter-sm": "0.75rem",
+            "gutter": "1rem",
+            "space-xl": "2rem",
+            "space-lg": "1.5rem",
+            "margin-sm": "1rem",
+            "space-sm": "0.5rem",
+            "margin": "1.25rem",
+            "space-xs": "0.25rem"
+          },
+          "fontFamily": {
+            "body-lg": ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+            "title-md": ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+            "label-md": ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+            "label-lg": ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+            "label-sm": ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+            "display-lg": ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+            "headline-md": ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+            "headline-lg": ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+            "body-md": ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+            "body-sm": ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"],
+            "headline-sm": ["Plus Jakarta Sans", "Noto Sans KR", "sans-serif"]
+          },
+          "fontSize": {
+            "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+            "title-md": ["16px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+            "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+            "label-sm": ["10px", {"lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700"}],
+            "display-lg": ["34px", {"lineHeight": "42px", "letterSpacing": "-0.03em", "fontWeight": "800"}],
+            "headline-md": ["22px", {"lineHeight": "30px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "headline-lg": ["26px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "body-md": ["14px", {"lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400"}],
+            "body-sm": ["12px", {"lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400"}],
+            "headline-sm": ["18px", {"lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      line-height: 1;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+    }
+    /* Hide scrollbar for carousels */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased flex justify-center items-start min-h-screen">
+<!-- Mobile Container (393x852 simulated frame) -->
+<div class="relative w-full max-w-[393px] min-h-screen bg-background flex flex-col shadow-2xl overflow-hidden pb-24">
+<!-- Android Status Bar -->
+<div class="w-full h-8 pt-2 px-6 flex justify-between items-center bg-surface/90 backdrop-blur-md sticky top-0 z-50 select-none">
+<span class="font-label-md text-label-md text-on-surface font-semibold tracking-tight">09:41</span>
+<div class="flex items-center space-x-1.5 text-on-surface">
+<span class="material-symbols-outlined text-[16px]">signal_cellular_alt</span>
+<span class="material-symbols-outlined text-[16px]">wifi</span>
+<span class="material-symbols-outlined text-[16px]">battery_full</span>
+</div>
+</div>
+<!-- Top App Bar & Search Cluster (Shared TopAppBar + Search Bar) -->
+<header class="bg-surface/90 backdrop-blur-md sticky top-8 z-40 px-margin pt-1 pb-3 flex flex-col gap-2.5">
+<!-- Top Brand row with MOA Identity & City Location Icon -->
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<img alt="MOA 로고 아이콘" class="w-8 h-8 rounded-xl object-cover shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC73XCh7zoxheVlu07-lSqKHB0Wj0WEFO-GpxMzbvLslaPlQZfZ0_KPtRK39aSWoto2CVJiRyZofZEChCEjRrJvTwaxavMmltRknP3qR-f22hz8--qd-De6GlHIudwWFVw5z5e_XpxMXAWwHGNGp62nW7b-O3TsDbmJSSLTB6snmS9Rb2Q0xnxweA0xVnGGAWqtBuwcRk7NoGSnjcvBqn7H0f3WHFfQVVYEdrHpSdKVbuMPvn9yh2sjy3ykuuT0HdXG"/>
+<span class="font-headline-lg text-headline-lg font-bold text-primary">모아</span>
+<span class="text-[11px] px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-bold tracking-tight">LIVE</span>
+</div>
+<button class="flex items-center space-x-1 text-on-surface-variant hover:text-primary active:scale-95 transition-transform p-1.5 rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined text-primary text-[20px]">location_on</span>
+<span class="font-label-md text-label-md font-semibold text-on-surface">대구</span>
+<span class="material-symbols-outlined text-[16px] text-tertiary">keyboard_arrow_down</span>
+</button>
+</div>
+<!-- Search Input & Filter Action Row -->
+<div class="flex items-center space-x-2">
+<div class="relative flex-1 flex items-center bg-surface-container-lowest rounded-full px-3.5 py-2 ring-2 ring-primary/40 shadow-sm transition-all">
+<span class="material-symbols-outlined text-primary text-[22px] mr-2">search</span>
+<input class="w-full bg-transparent border-0 p-0 text-on-surface font-body-md text-body-md focus:ring-0 focus:outline-none placeholder:text-outline" placeholder="공연명이나 아티스트 이름을 입력하세요" type="text" value="오케스트라"/>
+<button class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:bg-surface-variant active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[14px] font-bold">close</span>
+</button>
+</div>
+<!-- Filter Modal Trigger Button with Active Dot -->
+<button class="relative w-11 h-11 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm ring-1 ring-outline-variant/40 active:scale-95 transition-transform hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-[22px]">tune</span>
+<span class="absolute top-2 right-2.5 w-2 h-2 rounded-full bg-secondary-container ring-2 ring-surface-container-lowest"></span>
+</button>
+</div>
+<!-- Quick Filter Pills Bar -->
+<div class="flex items-center space-x-2 overflow-x-auto no-scrollbar pt-1 pb-0.5">
+<!-- Region Dropdown Pill -->
+<button class="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md active:scale-95 transition-all hover:bg-surface-container">
+<span>대구</span>
+<span class="material-symbols-outlined text-[14px]">arrow_drop_down</span>
+</button>
+<!-- Genre Pill (Active Selected with Lavender Accent) -->
+<button class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-sm active:scale-95 transition-all">
+<span class="text-[11px]">✦</span>
+<span>클래식</span>
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+<!-- Date Filter Pill -->
+<button class="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md active:scale-95 transition-all hover:bg-surface-container">
+<span class="material-symbols-outlined text-[15px] text-tertiary">calendar_today</span>
+<span>이번 달</span>
+<span class="material-symbols-outlined text-[14px]">arrow_drop_down</span>
+</button>
+<!-- Additional Price Pill -->
+<button class="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md active:scale-95 transition-all hover:bg-surface-container whitespace-nowrap">
+<span>예매가능</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-margin flex flex-col space-y-6 pt-3">
+<!-- Section 1: 최근 검색어 (Recent Searches) -->
+<section class="flex flex-col space-y-2.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-1.5">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">최근 검색어</h2>
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+</div>
+<button class="font-label-sm text-label-sm text-outline hover:text-on-surface-variant transition-colors">전체 삭제</button>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="inline-flex items-center space-x-1 px-3 py-1.5 rounded-full bg-surface-container text-on-surface font-body-sm text-body-sm border border-outline-variant/30 active:scale-95 transition-transform cursor-pointer">
+<span>아이유</span>
+<span class="material-symbols-outlined text-[14px] text-outline hover:text-on-surface">close</span>
+</span>
+<span class="inline-flex items-center space-x-1 px-3 py-1.5 rounded-full bg-surface-container text-on-surface font-body-sm text-body-sm border border-outline-variant/30 active:scale-95 transition-transform cursor-pointer">
+<span>오페라의 유령</span>
+<span class="material-symbols-outlined text-[14px] text-outline hover:text-on-surface">close</span>
+</span>
+<span class="inline-flex items-center space-x-1 px-3 py-1.5 rounded-full bg-surface-container text-on-surface font-body-sm text-body-sm border border-outline-variant/30 active:scale-95 transition-transform cursor-pointer">
+<span>대구콘서트하우스</span>
+<span class="material-symbols-outlined text-[14px] text-outline hover:text-on-surface">close</span>
+</span>
+<span class="inline-flex items-center space-x-1 px-3 py-1.5 rounded-full bg-surface-container text-on-surface font-body-sm text-body-sm border border-outline-variant/30 active:scale-95 transition-transform cursor-pointer">
+<span>재즈 페스티벌</span>
+<span class="material-symbols-outlined text-[14px] text-outline hover:text-on-surface">close</span>
+</span>
+</div>
+</section>
+<!-- Section 2: 인기 장르 바로가기 (Genre shortcuts) -->
+<section class="flex flex-col space-y-2.5">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">인기 장르 바로가기</h2>
+<span class="font-label-sm text-label-sm text-primary">실시간 인기</span>
+</div>
+<div class="grid grid-cols-5 gap-2">
+<!-- 콘서트 -->
+<button class="flex flex-col items-center justify-center p-2 rounded-2xl bg-surface-container-lowest border border-outline-variant/40 shadow-sm hover:bg-surface-container-low active:scale-95 transition-all group">
+<div class="w-11 h-11 rounded-full bg-secondary-fixed/50 flex items-center justify-center text-[20px] mb-1.5 group-hover:scale-110 transition-transform">
+              🎤
+            </div>
+<span class="font-label-md text-label-md text-on-surface">콘서트</span>
+</button>
+<!-- 뮤지컬 -->
+<button class="flex flex-col items-center justify-center p-2 rounded-2xl bg-surface-container-lowest border border-outline-variant/40 shadow-sm hover:bg-surface-container-low active:scale-95 transition-all group">
+<div class="w-11 h-11 rounded-full bg-primary-fixed/60 flex items-center justify-center text-[20px] mb-1.5 group-hover:scale-110 transition-transform">
+              🎭
+            </div>
+<span class="font-label-md text-label-md text-on-surface">뮤지컬</span>
+</button>
+<!-- 연극 -->
+<button class="flex flex-col items-center justify-center p-2 rounded-2xl bg-surface-container-lowest border border-outline-variant/40 shadow-sm hover:bg-surface-container-low active:scale-95 transition-all group">
+<div class="w-11 h-11 rounded-tr-2xl bg-surface-container flex items-center justify-center text-[20px] mb-1.5 group-hover:scale-110 transition-transform">
+              🎬
+            </div>
+<span class="font-label-md text-label-md text-on-surface">연극</span>
+</button>
+<!-- 클래식 (Selected / Highlighted state) -->
+<button class="flex flex-col items-center justify-center p-2 rounded-2xl bg-primary-fixed/40 ring-2 ring-primary border border-primary/20 shadow-sm active:scale-95 transition-all group">
+<div class="w-11 h-11 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center text-[20px] mb-1.5 group-hover:scale-110 transition-transform">
+              🎻
+            </div>
+<span class="font-label-md text-label-md text-primary font-bold">클래식</span>
+</button>
+<!-- 페스티벌 -->
+<button class="flex flex-col items-center justify-center p-2 rounded-2xl bg-surface-container-lowest border border-outline-variant/40 shadow-sm hover:bg-surface-container-low active:scale-95 transition-all group">
+<div class="w-11 h-11 rounded-full bg-secondary-container/40 flex items-center justify-center text-[20px] mb-1.5 group-hover:scale-110 transition-transform">
+              🎪
+            </div>
+<span class="font-label-md text-label-md text-on-surface">페스티벌</span>
+</button>
+</div>
+</section>
+<!-- Section 3: 검색 결과 (Search Results list) -->
+<section class="flex flex-col space-y-3 pt-1">
+<!-- Results Header -->
+<div class="flex items-center justify-between pb-1 border-b border-outline-variant/20">
+<div class="flex items-center space-x-1.5">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">검색 결과</h2>
+<span class="font-headline-sm text-headline-sm text-primary font-extrabold">(12건)</span>
+</div>
+<button class="flex items-center space-x-1 text-tertiary font-label-md text-label-md hover:text-on-surface">
+<span>공연일순</span>
+<span class="material-symbols-outlined text-[16px]">swap_vert</span>
+</button>
+</div>
+<!-- Result 1 -->
+<div class="flex p-3 rounded-2xl bg-surface-container-lowest border border-outline-variant/30 shadow-sm hover:shadow-md transition-all active:scale-[0.99] relative">
+<!-- Poster Thumbnail (3:4 ratio) -->
+<div class="relative w-[88px] h-[118px] rounded-xl overflow-hidden shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A grand symphony orchestra performing inside an opulent concert hall with soft violet and golden stage spotlights. Musicians in formal black attire hold violins and cellos under the warm illumination of modern acoustic wood paneling. The light mode atmospheric aesthetic is clean, sophisticated, and filled with vibrant artistic elegance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFTkuwUsT2qZOs-9zxKn6k7HTpk7NbbANWleMXfQgZ8WiIt6rWzed5Q246nlHG51OQuuW4ehJooUNRwwMGFOolNjDkpqWEekNDTz6MepjnT2XsyHImCKchboEdT-9w0FFdxz9BLnSasdLVkYP9aPXuPwILl6burLVxMHG5dhOWcBt6nuiNKBpq_YCRDoBzxMFLdI1TimcZAEJNL0fNZYC3yiKwDRFzfvPs7AeWJDG9wBz1_tGjMZM"/>
+<span class="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm">
+              공연예정
+            </span>
+</div>
+<!-- Metadata -->
+<div class="ml-3.5 flex flex-col justify-between flex-1 py-0.5">
+<div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-primary font-bold">클래식 · 정기연주회</span>
+<button class="p-1 rounded-full text-secondary hover:text-primary active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface line-clamp-2 leading-snug mt-0.5">
+                대구시립교향악단 제512회 정기연주회 &lt;봄의 소리&gt;
+              </h3>
+</div>
+<div class="space-y-0.5 mt-2">
+<div class="flex items-center space-x-1.5 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">calendar_month</span>
+<span>2025.04.18 (금) 19:30</span>
+</div>
+<div class="flex items-center space-x-1.5 text-tertiary font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">theater_comedy</span>
+<span>대구콘서트하우스 그랜드홀</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Result 2 -->
+<div class="flex p-3 rounded-2xl bg-surface-container-lowest border border-outline-variant/30 shadow-sm hover:shadow-md transition-all active:scale-[0.99] relative">
+<!-- Poster Thumbnail (3:4 ratio) -->
+<div class="relative w-[88px] h-[118px] rounded-xl overflow-hidden shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="An internationally renowned chamber orchestra performing classical European masterworks on a brightly lit concert stage. Warm ambient lavender stage beams reflect off polished string instruments and grand pianos, evoking an intimate cultural festival mood in a modern art center." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz8uGerXU9vOCIYkZaW0OzDMMoPUCw5PgsGsnZq5Dp_-IbxZ4p90kmRACoocrdmHmOIAsDUe5eguFkPREFWsmK4RTojg-rC2TELIYkBgGdd91pRajxaQSKl9cGy316pMXPDvPdK6b0IXuApN3EiI7wbe5vjoYoyDudrjU7H8x20rxeffkCO6ejhjPtQoOfhRv_GP9VWrYKtv9PC6_emKOfi2q2uinj7iXof3WapDqTqOHTPv5rFO0"/>
+<span class="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm">
+              공연예정
+            </span>
+</div>
+<!-- Metadata -->
+<div class="ml-3.5 flex flex-col justify-between flex-1 py-0.5">
+<div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-primary font-bold">클래식 · 내한공연</span>
+<button class="p-1 rounded-full text-outline hover:text-secondary active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface line-clamp-2 leading-snug mt-0.5">
+                비엔나 체임버 오케스트라 내한공연
+              </h3>
+</div>
+<div class="space-y-0.5 mt-2">
+<div class="flex items-center space-x-1.5 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">calendar_month</span>
+<span>2025.05.02 (금) 19:30</span>
+</div>
+<div class="flex items-center space-x-1.5 text-tertiary font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">theater_comedy</span>
+<span>수성아트피아 대극장</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Result 3 -->
+<div class="flex p-3 rounded-2xl bg-surface-container-lowest border border-outline-variant/30 shadow-sm hover:shadow-md transition-all active:scale-[0.99] relative">
+<!-- Poster Thumbnail (3:4 ratio) -->
+<div class="relative w-[88px] h-[118px] rounded-xl overflow-hidden shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A cinematic symphonic film music concert set within a large auditorium, illuminated with sparkling cinematic fantasy projections and vibrant purple-pink mood lighting. The conductor leads a full orchestra surrounded by gentle mist and ethereal spotlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxcm5xvpj-Wb1_3o1fWX3bngUe1gO5Nzp9JsUL_RyGXRmej_X16VrBie06elM2UPyeRNhqIVn__YacgCS19uStQU8cvohzTnyGeZbJExTa5nFphYkZd8i1dFSru7ytiZyhWGfyVh3v_RmoaAp8upsIpMIhlGb4M5WUFYe8ozpPM2DVIbvIAFcA1EynNd2tIT4AQxOkUqjnMiQBLbFOI_HSgP3ltw2x1RJpJn-7rG_CYlXkObwLhIU"/>
+<span class="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-bold">
+              인기티켓
+            </span>
+</div>
+<!-- Metadata -->
+<div class="ml-3.5 flex flex-col justify-between flex-1 py-0.5">
+<div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-primary font-bold">콘서트/클래식 · 영화음악</span>
+<button class="p-1 rounded-full text-secondary hover:text-primary active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface line-clamp-2 leading-snug mt-0.5">
+                히사이시 조 영화음악 콘서트 2025_대구
+              </h3>
+</div>
+<div class="space-y-0.5 mt-2">
+<div class="flex items-center space-x-1.5 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">calendar_month</span>
+<span>2025.05.24 (토) 17:00</span>
+</div>
+<div class="flex items-center space-x-1.5 text-tertiary font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">theater_comedy</span>
+<span>대구 엑스코 오디토리움</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Mandatory Shared Component: BottomNavBar) -->
+<!-- Active intent is "검색" (Search tab active) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-gutter pb-safe bg-surface/90 dark:bg-surface/90 backdrop-blur-md shadow-lg dark:shadow-none">
+<!-- Tab 1: 홈 (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-3 py-1.5 active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="font-label-md text-label-md mt-0.5">홈</span>
+</a>
+<!-- Tab 2: 검색 (ACTIVE: Matching JSON style_active_navigation) -->
+<a class="flex flex-col items-center justify-center bg-primary-fixed text-on-primary-fixed dark:bg-primary-container dark:text-on-primary-container rounded-full px-5 py-1.5 transition-all duration-200 active:scale-95" href="#">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">search</span>
+<span class="font-label-md text-label-md font-bold mt-0.5">검색</span>
+</a>
+<!-- Tab 3: 찜 (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-3 py-1.5 active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined text-[24px]">favorite</span>
+<span class="font-label-md text-label-md mt-0.5">찜</span>
+</a>
+<!-- Tab 4: 설정 (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-3 py-1.5 active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+<span class="font-label-md text-label-md mt-0.5">설정</span>
+</a>
+</nav>
+<!-- Android Bottom Gesture Indicator Bar -->
+<div class="fixed bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-on-surface/40 rounded-full z-50 pointer-events-none"></div>
+</div>
+</body></html>

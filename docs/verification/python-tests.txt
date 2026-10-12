@@ -1,0 +1,13 @@
+test_api_failure_does_not_print_service_key (test_collect.CollectorTests.test_api_failure_does_not_print_service_key) ... ok
+test_cross_month_performance_is_in_both_files (test_collect.CollectorTests.test_cross_month_performance_is_in_both_files) ... ok
+test_empty_collection_preserves_existing_files (test_collect.CollectorTests.test_empty_collection_preserves_existing_files) ... ok
+test_failed_swap_restores_previous_publication (test_collect.CollectorTests.test_failed_swap_restores_previous_publication) ... ok
+test_normalization_and_safe_booking_links (test_collect.CollectorTests.test_normalization_and_safe_booking_links) ... ok
+test_output_cannot_replace_sources_or_unrelated_files (test_collect.CollectorTests.test_output_cannot_replace_sources_or_unrelated_files) ... ok
+test_reversed_dates_rejected (test_collect.CollectorTests.test_reversed_dates_rejected) ... ok
+test_swap_uses_complete_validated_publication (test_collect.CollectorTests.test_swap_uses_complete_validated_publication) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.033s
+
+OK

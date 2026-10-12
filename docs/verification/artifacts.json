@@ -1,0 +1,25 @@
+{
+  "verifiedAt": "2026-10-13T00:38:44+09:00",
+  "artifacts": [
+    {
+      "file": "moa-debug.apk",
+      "bytes": 68237867,
+      "sha256": "758023ce8cc90a95a6fd871a2395cf8af51672cb4aa30049a734fdb85bc1752d"
+    },
+    {
+      "file": "moa-preview.apk",
+      "bytes": 5192000,
+      "sha256": "4d687ac32781f7a9aa2663c0cff330328e0f69b3c6c1340d04d5b1a2e6efbb5a"
+    },
+    {
+      "file": "moa-release-unsigned.aab",
+      "bytes": 6010159,
+      "sha256": "416e82530fc54cbab0a39b7f4e36fd223c47f5164d9199b913a93de940d50ad9"
+    },
+    {
+      "file": "moa-release-unsigned.apk",
+      "bytes": 5179712,
+      "sha256": "a0664f7222ac6c7e5827872c2db9c53e6eb1d29f112c5c3cd50acad1781ff042"
+    }
+  ]
+}

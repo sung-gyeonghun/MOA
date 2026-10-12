@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="kr.moa.app.data.FiltersTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-12T15:28:34" hostname="CASTLE" time="0.067">
+  <properties/>
+  <testcase name="endSortAndCustomRange" classname="kr.moa.app.data.FiltersTest" time="0.049"/>
+  <testcase name="artistSearchAndRegionIntersection" classname="kr.moa.app.data.FiltersTest" time="0.01"/>
+  <testcase name="spanningPerformanceIncluded" classname="kr.moa.app.data.FiltersTest" time="0.0"/>
+  <testcase name="multipleGenresUseOr" classname="kr.moa.app.data.FiltersTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
