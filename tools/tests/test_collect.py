@@ -139,4 +139,27 @@ class CollectorTests(unittest.TestCase):
             self.assertEqual(items, [item])
             self.assertEqual(count, 0)
 
+    def test_changed_item_cannot_reuse_checkpoint_from_previous_publication(self):
+        item = collect.normalize(self.fixture(), self.fixture())
+        root = ET.Element('dbs'); root.append(self.fixture())
+        with tempfile.TemporaryDirectory() as tmp:
+            checkpoint = Path(tmp)
+            with patch.object(collect, 'request', return_value=root):
+                collect.collect_items('fake', {item['id']: self.fixture()}, {}, set(), True, checkpoint)
+            published = collect.datetime.now(collect.ZoneInfo('Asia/Seoul'))
+            root.find('db/prfcast').text = '변경된 출연자'
+            with patch.object(collect, 'request', return_value=root) as request:
+                items, count = collect.collect_items('fake', {item['id']: self.fixture()}, {item['id']: item}, {item['id']}, False, checkpoint, published)
+            self.assertEqual(request.call_count, 1)
+            self.assertEqual(count, 1)
+            self.assertEqual(items[0]['artists'], ['변경된 출연자'])
+
+    def test_current_kopis_merged_region_and_domestic_scope(self):
+        fixture = self.fixture()
+        fixture.find('area').text = '전남광주통합특별시'
+        item = collect.normalize(fixture, fixture)
+        self.assertEqual(item['region'], '전남광주')
+        overseas = {**item, 'id': 'PF999999', 'region': '해외'}
+        self.assertEqual(collect.domestic_only([item, overseas]), [item])
+
 if __name__ == '__main__': unittest.main()

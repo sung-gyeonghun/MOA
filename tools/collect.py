@@ -12,6 +12,7 @@ import shutil
 import tempfile
 import time
 import uuid
+import hashlib
 from urllib.parse import urlencode, urlparse
 from urllib.request import urlopen
 import xml.etree.ElementTree as ET
@@ -19,6 +20,7 @@ from zoneinfo import ZoneInfo
 
 BASE = "https://www.kopis.or.kr/openApi/restful/"
 REGIONS = {"서울특별시": "서울", "부산광역시": "부산", "대구광역시": "대구", "인천광역시": "인천", "광주광역시": "광주", "대전광역시": "대전", "울산광역시": "울산", "세종특별자치시": "세종", "경기도": "경기", "강원특별자치도": "강원", "강원도": "강원", "충청북도": "충북", "충청남도": "충남", "전북특별자치도": "전북", "전라북도": "전북", "전라남도": "전남", "경상북도": "경북", "경상남도": "경남", "제주특별자치도": "제주"}
+REGIONS.update({"전남광주통합특별시": "전남광주", "광주": "전남광주", "광주광역시": "전남광주", "전남": "전남광주", "전라남도": "전남광주"})
 GENRES = {"대중음악": "콘서트", "서양음악(클래식)": "클래식", "한국음악(국악)": "국악", "무용(서양/한국무용)": "무용", "대중무용": "무용", "서커스/마술": "서커스/마술"}
 # KOPIS OpenAPI common-code document; the listing response supplies genrenm.
 GENRE_CODES = {"연극": "AAAA", "뮤지컬": "GGGA", "서양음악(클래식)": "CCCA", "한국음악(국악)": "CCCC", "대중음악": "CCCD", "무용(서양/한국무용)": "BBBC", "대중무용": "BBBR", "서커스/마술": "EEEB", "복합": "EEEA"}
@@ -103,7 +105,8 @@ def build_publication(items: list[dict], destination: Path, today: date, months:
         files.append(path)
     for item in items:
         write_json(destination / "details" / (item["id"] + ".json"), item)
-    write_json(destination / "manifest.json", {"version": updated, "updatedAt": updated, "files": files, "source": "KOPIS", "count": len(items)})
+    hashes = {filename: hashlib.sha256((destination / filename).read_bytes()).hexdigest() for filename in files}
+    write_json(destination / "manifest.json", {"version": updated, "updatedAt": updated, "files": files, "source": "KOPIS", "count": len(items), "fileHashes": hashes})
     (destination / "index.html").write_text('<!doctype html><meta charset="utf-8"><title>모아 공연 데이터</title><h1>모아 · 공연 데이터</h1><p>출처: (재)예술경영지원센터 공연예술통합전산망(www.kopis.or.kr)</p><a href="manifest.json">데이터 갱신 정보</a>', encoding="utf-8")
     (destination / ".nojekyll").touch()
 
@@ -189,12 +192,14 @@ def summary_matches(item: dict, summary: ET.Element):
     }
     return all(not value or item.get(name) == value for name, value in expected.items())
 
-def read_checkpoint(directory: Path | None, identity: str, summary: ET.Element):
+def read_checkpoint(directory: Path | None, identity: str, summary: ET.Element, after: datetime | None = None):
     if directory is None:
         return None
     try:
         record = json.loads((directory / f"{identity}.json").read_text(encoding="utf-8"))
         fetched = datetime.fromisoformat(record["fetchedAt"])
+        if after is not None and fetched <= after:
+            return None
         if datetime.now(ZoneInfo("Asia/Seoul")) - fetched > timedelta(hours=3):
             return None
         validate(record["item"])
@@ -204,7 +209,7 @@ def read_checkpoint(directory: Path | None, identity: str, summary: ET.Element):
     except (OSError, ValueError, KeyError, TypeError):
         return None
 
-def collect_items(key, summaries, previous, changed, full, checkpoint: Path | None = None):
+def collect_items(key, summaries, previous, changed, full, checkpoint: Path | None = None, checkpoint_after: datetime | None = None):
     items = []
     refreshed = 0
     for identity, summary in summaries.items():
@@ -212,7 +217,7 @@ def collect_items(key, summaries, previous, changed, full, checkpoint: Path | No
         if not full and cached and identity not in changed and summary_matches(cached, summary):
             items.append(cached)
         else:
-            resumed = read_checkpoint(checkpoint, identity, summary)
+            resumed = read_checkpoint(checkpoint, identity, summary, checkpoint_after)
             if resumed:
                 items.append(resumed)
                 continue
@@ -232,6 +237,9 @@ def collect_items(key, summaries, previous, changed, full, checkpoint: Path | No
             if refreshed % 100 == 0:
                 print(f"Refreshed {refreshed} details", flush=True)
     return items, refreshed
+
+def domestic_only(items):
+    return [item for item in items if item["region"] != "해외"]
 
 def main():
     parser = argparse.ArgumentParser()
@@ -256,8 +264,10 @@ def main():
     if not full:
         since = datetime.fromisoformat(previous_manifest["updatedAt"]).date() - timedelta(days=1)
         changed = set(fetch_summaries(key, today, args.months, f"{since:%Y%m%d}"))
-    items, refreshed = collect_items(key, summaries, previous, changed, full, args.checkpoint_dir)
+    checkpoint_after = datetime.fromisoformat(previous_manifest["updatedAt"]) if previous_manifest else None
+    items, refreshed = collect_items(key, summaries, previous, changed, full, args.checkpoint_dir, checkpoint_after)
     print(f"Mode: {'full' if full else 'incremental'}; refreshed {refreshed}, reused {len(items)-refreshed}")
+    items = domestic_only(items)
     updated = datetime.now(ZoneInfo("Asia/Seoul")).isoformat(timespec="seconds")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=args.output.parent) as staging:

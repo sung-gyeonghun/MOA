@@ -13,7 +13,7 @@ data class Performance(
     val description: String = "", val artwork: String = "", val festival: Boolean = false
 )
 @Serializable data class Booking(val name: String, val url: String)
-@Serializable data class Manifest(val version: String, val updatedAt: String, val files: List<String>, val source: String = "KOPIS", val count: Int = 0)
+@Serializable data class Manifest(val version: String, val updatedAt: String, val files: List<String>, val source: String = "KOPIS", val count: Int = 0, val fileHashes: Map<String, String> = emptyMap())
 @Serializable data class Catalog(val updatedAt: String, val performances: List<Performance>, val sample: Boolean = false)
 
 fun dateLabel(p: Performance): String {
@@ -25,7 +25,7 @@ fun dateLabel(p: Performance): String {
 }
 
 val genres = listOf("콘서트", "뮤지컬", "연극", "클래식", "국악", "무용", "서커스/마술", "복합", "축제")
-val regions = listOf("전국", "서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종", "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주")
+val regions = listOf("전국", "서울", "부산", "대구", "인천", "전남광주", "대전", "울산", "세종", "경기", "강원", "충북", "충남", "전북", "경북", "경남", "제주")
 
 data class Filters(val region: String = "전국", val genres: Set<String> = emptySet(), val date: String = "전체 일정", val from: LocalDate? = null, val to: LocalDate? = null, val descending: Boolean = false)
 

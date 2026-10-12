@@ -109,7 +109,15 @@ class MoaRepository @Inject constructor(
         val all = manifest.files.flatMap { path ->
             require(!path.contains("..") && path.matches(Regex("performances/[0-9]{4}-[0-9]{2}\\.json"))) { "잘못된 파일 경로입니다." }
             java.time.YearMonth.parse(path.substringAfter('/').substringBefore('.'))
-            api.fetch(base + path).use { json.decodeFromString<List<Performance>>(it.string()) }
+            api.fetch(base + path).use {
+                val payload = it.bytes()
+                val expected = manifest.fileHashes[path]
+                if (expected != null) {
+                    val actual = java.security.MessageDigest.getInstance("SHA-256").digest(payload).joinToString("") { byte -> "%02x".format(byte) }
+                    require(actual == expected) { "공연 데이터 무결성 검증에 실패했습니다." }
+                }
+                json.decodeFromString<List<Performance>>(payload.toString(Charsets.UTF_8))
+            }
         }.distinctBy { it.id }
         require(all.isNotEmpty()) { "공연 데이터가 비어 있습니다. 기존 데이터를 유지합니다." }
         all.forEach { require(it.id.matches(Regex("PF[0-9]+")) && it.title.isNotBlank() && java.time.LocalDate.parse(it.startDate) <= java.time.LocalDate.parse(it.endDate)) }
