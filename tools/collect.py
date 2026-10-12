@@ -190,7 +190,16 @@ def summary_matches(item: dict, summary: ET.Element):
         "genre": GENRES.get(field(summary, "genrenm"), field(summary, "genrenm")),
         "status": field(summary, "prfstate"),
     }
-    return all(not value or item.get(name) == value for name, value in expected.items())
+    for name, value in expected.items():
+        if not value or item.get(name) == value:
+            continue
+        if name == "venue":
+            detailed = item.get("venue", "")
+            # KOPIS detail adds the hall in parentheses; the list only names the facility.
+            if detailed.startswith(value) and detailed[len(value):].lstrip().startswith("("):
+                continue
+        return False
+    return True
 
 def read_checkpoint(directory: Path | None, identity: str, summary: ET.Element, after: datetime | None = None):
     if directory is None:
@@ -259,6 +268,7 @@ def main():
     last_full = (previous_manifest or {}).get("lastFullSyncAt", "")
     full = args.full or not previous or not last_full or date.fromisoformat(last_full[:10]) <= today - timedelta(days=7)
     summaries = fetch_summaries(key, today, args.months)
+    summaries = {identity: row for identity, row in summaries.items() if field(row, "area") != "해외"}
     print(f"Found {len(summaries)} unique performances")
     changed = set()
     if not full:

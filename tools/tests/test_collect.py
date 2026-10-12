@@ -162,4 +162,14 @@ class CollectorTests(unittest.TestCase):
         overseas = {**item, 'id': 'PF999999', 'region': '해외'}
         self.assertEqual(collect.domestic_only([item, overseas]), [item])
 
+    def test_detail_hall_suffix_does_not_invalidate_unchanged_summary(self):
+        summary = self.fixture()
+        ET.SubElement(summary, 'fcltynm').text = '진해아트홀'
+        detail = self.fixture()
+        ET.SubElement(detail, 'fcltynm').text = '진해아트홀 (진해아트홀)'
+        item = collect.normalize(summary, detail)
+        self.assertTrue(collect.summary_matches(item, summary))
+        summary.find('fcltynm').text = '다른 공연장'
+        self.assertFalse(collect.summary_matches(item, summary))
+
 if __name__ == '__main__': unittest.main()
