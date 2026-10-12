@@ -3,6 +3,11 @@ on:
   schedule:
     - cron: '17 */3 * * *'
   workflow_dispatch:
+    inputs:
+      publish_bootstrap:
+        description: 'Publish the validated bootstrap snapshot without another API refresh'
+        type: boolean
+        default: false
 permissions:
   contents: read
   pages: write
@@ -32,9 +37,12 @@ jobs:
           key: kopis-v3-${{ github.run_id }}
           restore-keys: kopis-v3-
       - name: Collect and validate
+        if: inputs.publish_bootstrap != true
         env:
           KOPIS_API_KEY: ${{ secrets.KOPIS_API_KEY }}
         run: python tools/collect.py --output public --months 6
+      - name: Validate published snapshot
+        run: python tools/validate_snapshot.py public
       - uses: actions/cache/save@v4
         if: always()
         with:

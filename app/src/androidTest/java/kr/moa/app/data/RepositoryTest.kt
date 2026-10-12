@@ -35,7 +35,10 @@ class RepositoryTest {
     private lateinit var databaseName: String
     private lateinit var settings: DataStore<StoredPreferences>
     private val p = Performance("PF123456", "테스트 콘서트", "콘서트", "대구", "테스트 공연장", "2026-10-01", "2026-11-10", artists = listOf("모아"))
-    private val manifest = Manifest("version-1", "2026-10-13T00:00:00+09:00", listOf("performances/2026-10.json", "performances/2026-11.json"), count = 1)
+    private val manifest = Manifest("version-1", "2026-10-13T00:00:00+09:00", listOf("performances/2026-10.json", "performances/2026-11.json"), count = 1,
+        fileHashes = listOf("performances/2026-10.json", "performances/2026-11.json").associateWith {
+            java.security.MessageDigest.getInstance("SHA-256").digest(json.encodeToString(listOf(p)).toByteArray()).joinToString("") { byte -> "%02x".format(byte) }
+        })
 
     @Before fun setUp() {
         context = ApplicationProvider.getApplicationContext()
@@ -93,7 +96,7 @@ class RepositoryTest {
         server.enqueue(MockResponse().setBody("{invalid"))
         assertRejected { repository.refresh(server.url("/").toString()) }
         assertEquals(original, repository.initial())
-        server.enqueue(MockResponse().setBody(json.encodeToString(manifest)))
+        server.enqueue(MockResponse().setBody(json.encodeToString(manifest.copy(fileHashes = emptyMap()))))
         server.enqueue(MockResponse().setBody("[]")); server.enqueue(MockResponse().setBody("[]"))
         assertRejected { repository.refresh(server.url("/").toString()) }
         assertEquals(original, repository.initial())
@@ -103,7 +106,7 @@ class RepositoryTest {
         enqueueSnapshot(manifest.copy(version = "version-2"))
         assertRejected { repository.refresh(server.url("/").toString()) }
         assertEquals(original, repository.initial())
-        server.enqueue(MockResponse().setBody(json.encodeToString(manifest)))
+        server.enqueue(MockResponse().setBody(json.encodeToString(manifest.copy(fileHashes = emptyMap()))))
         repeat(2) { server.enqueue(MockResponse().setBody(json.encodeToString(listOf(p.copy(endDate = "2020-01-01"))))) }
         assertRejected { repository.refresh(server.url("/").toString()) }
         assertEquals(original, repository.initial())
@@ -150,5 +153,13 @@ class RepositoryTest {
         assertEquals(5000, catalog.performances.size)
         println("CACHE_LOAD_5000_MS=$elapsed")
         assertTrue("Cached 5000-record load took ${elapsed}ms", elapsed < 2000)
+    }
+    @Test fun mismatchedFileChecksumKeepsLastGoodSnapshot() = runBlocking {
+        val original = loadSnapshot()
+        val invalid = manifest.copy(fileHashes = mapOf("performances/2026-10.json" to "0".repeat(64)))
+        server.enqueue(MockResponse().setBody(json.encodeToString(invalid)))
+        server.enqueue(MockResponse().setBody(json.encodeToString(listOf(p))))
+        assertRejected { repository.refresh(server.url("/").toString()) }
+        assertEquals(original, repository.initial())
     }
 }

@@ -146,7 +146,7 @@ class MainActivity : ComponentActivity() {
     Column(Modifier.width(190.dp).clickable(onClick = open)) {
         Box(Modifier.fillMaxWidth().aspectRatio(0.72f).clip(RoundedCornerShape(20.dp))) { PosterArt(p, Modifier.fillMaxSize()); Heart(saved, favorite, Modifier.align(Alignment.TopEnd).padding(10.dp)); Surface(color = Pink, shape = RoundedCornerShape(50), modifier = Modifier.align(Alignment.BottomStart).padding(12.dp)) { Text(p.genre, color = Ink, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) } }
         Text(p.title, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 22.sp, modifier = Modifier.padding(top = 12.dp).heightIn(min = 44.dp))
-        Text(dateLabel(p), fontSize = 11.sp, color = Muted, modifier = Modifier.padding(top = 6.dp)); Text("${p.venue} · ${p.region}", fontSize = 11.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
+        Text(dateLabel(p), fontSize = 11.sp, color = Muted, modifier = Modifier.padding(top = 6.dp)); Text("${p.venue.ifBlank { "공연장 정보 없음" }} · ${p.region.ifBlank { "지역 정보 없음" }}", fontSize = 11.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
     }
 }
 @Composable fun Heart(saved: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) { Surface(shape = RoundedCornerShape(50), color = Color.White.copy(alpha = .94f), modifier = modifier) { IconButton(onClick = onClick, modifier = Modifier.size(48.dp)) { Icon(if (saved) Icons.Rounded.Favorite else Icons.Outlined.FavoriteBorder, if (saved) "찜 해제" else "찜하기", tint = if (saved) Color(0xFFD76B95) else Muted, modifier = Modifier.size(23.dp)) } } }
@@ -187,7 +187,7 @@ class MainActivity : ComponentActivity() {
             Column(Modifier.weight(1f).padding(start = 12.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) { Text("${p.genre} · ${p.region}", color = Purple, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)); IconButton(onClick = favorite, modifier = Modifier.size(48.dp)) { Icon(if (saved) Icons.Rounded.Favorite else Icons.Outlined.FavoriteBorder, if (saved) "찜 해제" else "찜하기", tint = if (saved) Color(0xFFD76B95) else Muted, modifier = Modifier.size(21.dp)) } }
                 Text(p.title, fontSize = 15.sp, fontWeight = FontWeight.Bold, lineHeight = 21.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                Text(dateLabel(p), fontSize = 11.sp, color = Muted, modifier = Modifier.padding(top = 8.dp)); Text(p.venue, fontSize = 11.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
+                Text(dateLabel(p), fontSize = 11.sp, color = Muted, modifier = Modifier.padding(top = 8.dp)); Text(p.venue.ifBlank { "공연장 정보 없음" }, fontSize = 11.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
             }
         }
     }
@@ -246,7 +246,7 @@ class MainActivity : ComponentActivity() {
         Surface(color = Lavender, shape = RoundedCornerShape(24.dp)) { Row(Modifier.fillMaxWidth().padding(20.dp), verticalAlignment = Alignment.CenterVertically) { Image(painterResource(R.drawable.app_icon), null, Modifier.size(62.dp).clip(RoundedCornerShape(16.dp))); Column(Modifier.padding(start = 16.dp)) { Text("보고 싶은 공연,", fontSize = 15.sp, fontWeight = FontWeight.Bold); Text("여기 다 모아.", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Purple) } } }
         SectionTitle("내 탐색 설정"); Surface(onClick = onFilter, shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, Lavender)) { Column(Modifier.fillMaxWidth().padding(18.dp)) { Text("기본 지역 · 관심 장르", fontWeight = FontWeight.Bold, fontSize = 14.sp); Text("${filters.region} · ${filters.genres.joinToString(", ").ifBlank { "전체 장르" }}", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp)) } }
         SectionTitle("공연 데이터", if (catalog?.sample == true) "현재 디자인 체험 데이터를 보고 있어요." else "마지막으로 저장된 공연은 오프라인에서도 볼 수 있어요.")
-        Text("최종 갱신: ${catalog?.updatedAt?.ifBlank { "아직 갱신되지 않음" } ?: "불러오는 중"}", color = Muted, fontSize = 12.sp)
+        Text("최종 갱신: ${catalog?.updatedAt?.let { updatedLabel(it) }?.ifBlank { "아직 갱신되지 않음" } ?: "불러오는 중"}", color = Muted, fontSize = 12.sp)
         OutlinedTextField(value = endpoint, onValueChange = { endpoint = it }, label = { Text("GitHub Pages 데이터 주소") }, placeholder = { Text("https://사용자.github.io/저장소/") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), supportingText = { Text("manifest.json이 있는 HTTPS 주소를 입력해주세요.") }, singleLine = true)
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { OutlinedButton(onClick = { saveEndpoint(endpoint) }, enabled = endpoint.isBlank() || runCatching { java.net.URI(endpoint).let { it.scheme == "https" && it.host != null } }.getOrDefault(false)) { Text("주소 저장") }; Button(onClick = refresh, enabled = !busy) { Text(if (busy) "불러오는 중…" else "데이터 갱신") } }
         HorizontalDivider(color = Lavender); Text("모아 v1.0.0\n공연 정보 출처: (재)예술경영지원센터 KOPIS\n찜과 선호 설정은 이 기기에 저장됩니다.", color = Muted, fontSize = 12.sp, lineHeight = 22.sp)

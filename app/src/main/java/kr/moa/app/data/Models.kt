@@ -24,6 +24,10 @@ fun dateLabel(p: Performance): String {
     return "$start — ${end.replace('-', '.')}"
 }
 
+fun updatedLabel(value: String): String = runCatching {
+    java.time.OffsetDateTime.parse(value).atZoneSameInstant(java.time.ZoneId.systemDefault()).format(java.time.format.DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"))
+}.getOrElse { value.replace('-', '.') }
+
 val genres = listOf("콘서트", "뮤지컬", "연극", "클래식", "국악", "무용", "서커스/마술", "복합", "축제")
 val regions = listOf("전국", "서울", "부산", "대구", "인천", "전남광주", "대전", "울산", "세종", "경기", "강원", "충북", "충남", "전북", "경북", "경남", "제주")
 

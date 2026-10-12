@@ -81,7 +81,7 @@ class MoaRepository @Inject constructor(
     private val historyKey = stringPreferencesKey("history")
     private val updatedKey = stringPreferencesKey("updated")
     private val sampleKey = booleanPreferencesKey("sample")
-    val preferences = settings.data.map { p -> Preferences(p[regionKey] ?: "전국", p[genresKey] ?: emptySet(), p[endpointKey] ?: if (BuildConfig.DEBUG) "" else "https://sung-gyeonghun.github.io/MOA/", runCatching { json.decodeFromString<List<String>>(p[historyKey] ?: "[]") }.getOrDefault(emptyList()), p[updatedKey] ?: "", p[sampleKey] ?: true) }
+    val preferences = settings.data.map { p -> Preferences((p[regionKey] ?: "전국").let { if (it in setOf("광주", "전남", "전남광주통합특별시")) "전남광주" else it }, p[genresKey] ?: emptySet(), p[endpointKey] ?: if (BuildConfig.DEBUG) "" else "https://sung-gyeonghun.github.io/MOA/", runCatching { json.decodeFromString<List<String>>(p[historyKey] ?: "[]") }.getOrDefault(emptyList()), p[updatedKey] ?: "", p[sampleKey] ?: true) }
     val favorites = dao.favorites().map { list -> list.mapNotNull { runCatching { json.decodeFromString<Performance>(it.payload) }.getOrNull() } }
     suspend fun initial(): Catalog = withContext(Dispatchers.IO) {
         val saved = dao.catalog().mapNotNull { runCatching { json.decodeFromString<Performance>(it.payload) }.getOrNull() }
