@@ -33,6 +33,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
@@ -74,7 +75,7 @@ class MainActivity : ComponentActivity() {
     val snack = remember { SnackbarHostState() }
     LaunchedEffect(message) { message?.let { snack.showSnackbar(it); vm.message.value = null } }
     val open: (Performance) -> Unit = { nav.navigate("detail/${it.id}") }
-    Scaffold(containerColor = Canvas, snackbarHost = { SnackbarHost(snack) }, bottomBar = {
+    Scaffold(modifier = Modifier.imePadding(), containerColor = Canvas, snackbarHost = { SnackbarHost(snack) }, bottomBar = {
         if (!route.startsWith("detail")) Surface(color = Color.White, shadowElevation = 8.dp) {
             NavigationBar(containerColor = Color.White, tonalElevation = 0.dp) {
                 listOf(Triple("home", "발견", Icons.Outlined.Home), Triple("search", "검색", Icons.Outlined.Search), Triple("favorites", "찜", Icons.Outlined.FavoriteBorder), Triple("settings", "설정", Icons.Outlined.Tune)).forEach { (r, label, icon) ->
@@ -88,7 +89,7 @@ class MainActivity : ComponentActivity() {
             composable("search") { SearchScreen(catalog, filters, query, prefs.history, favorites, { vm.query.value = it }, vm::search, vm::clearHistory, { filterOpen = true }, { vm.defaults(it) }, vm::favorite, open) }
             composable("favorites") { FavoritesScreen(favorites, vm::favorite, open) }
             composable("settings") { SettingsScreen(prefs, catalog, filters, busy, { filterOpen = true }, vm::endpoint, vm::refresh) }
-            composable("detail/{id}") { back -> val id = back.arguments?.getString("id"); val p = catalog?.performances?.find { it.id == id } ?: favorites.find { it.id == id }; if (p != null) DetailScreen(p, favorites.any { it.id == p.id }, catalog?.sample == true, { nav.popBackStack() }, { vm.favorite(p) }) else EmptyState("공연 정보를 찾지 못했어요", "목록으로 돌아가 다시 선택해주세요.") }
+            composable("detail/{id}") { back -> val id = back.arguments?.getString("id"); val p = catalog?.performances?.find { it.id == id } ?: favorites.find { it.id == id }; if (p != null) DetailScreen(p, favorites.any { it.id == p.id }, catalog?.sample == true || p.id.startsWith("DEMO"), { nav.popBackStack() }, { vm.favorite(p) }) else EmptyState("공연 정보를 찾지 못했어요", "목록으로 돌아가 다시 선택해주세요.") }
         }
     }
     if (filterOpen) FilterSheet(filters, { filterOpen = false }) { vm.defaults(it); filterOpen = false }
@@ -146,7 +147,7 @@ class MainActivity : ComponentActivity() {
     Column(Modifier.width(190.dp).clickable(onClick = open)) {
         Box(Modifier.fillMaxWidth().aspectRatio(0.72f).clip(RoundedCornerShape(20.dp))) { PosterArt(p, Modifier.fillMaxSize()); Heart(saved, favorite, Modifier.align(Alignment.TopEnd).padding(10.dp)); Surface(color = Pink, shape = RoundedCornerShape(50), modifier = Modifier.align(Alignment.BottomStart).padding(12.dp)) { Text(p.genre, color = Ink, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) } }
         Text(p.title, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 22.sp, modifier = Modifier.padding(top = 12.dp).heightIn(min = 44.dp))
-        Text(dateLabel(p), fontSize = 11.sp, color = Muted, modifier = Modifier.padding(top = 6.dp)); Text("${p.venue.ifBlank { "공연장 정보 없음" }} · ${p.region.ifBlank { "지역 정보 없음" }}", fontSize = 11.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
+        Text(dateLabel(p), fontSize = 11.sp, color = Muted, modifier = Modifier.padding(top = 6.dp)); Text("${venueLabel(p.venue)} · ${p.region.ifBlank { "지역 정보 없음" }}", fontSize = 11.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
     }
 }
 @Composable fun Heart(saved: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) { Surface(shape = RoundedCornerShape(50), color = Color.White.copy(alpha = .94f), modifier = modifier) { IconButton(onClick = onClick, modifier = Modifier.size(48.dp)) { Icon(if (saved) Icons.Rounded.Favorite else Icons.Outlined.FavoriteBorder, if (saved) "찜 해제" else "찜하기", tint = if (saved) Color(0xFFD76B95) else Muted, modifier = Modifier.size(23.dp)) } } }
@@ -185,9 +186,9 @@ class MainActivity : ComponentActivity() {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             PosterArt(p, Modifier.width(82.dp).height(118.dp).clip(RoundedCornerShape(12.dp)))
             Column(Modifier.weight(1f).padding(start = 12.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) { Text("${p.genre} · ${p.region}", color = Purple, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)); IconButton(onClick = favorite, modifier = Modifier.size(48.dp)) { Icon(if (saved) Icons.Rounded.Favorite else Icons.Outlined.FavoriteBorder, if (saved) "찜 해제" else "찜하기", tint = if (saved) Color(0xFFD76B95) else Muted, modifier = Modifier.size(21.dp)) } }
+                Row(verticalAlignment = Alignment.CenterVertically) { Text("${if (p.id.startsWith("DEMO")) "체험용 · " else ""}${p.genre} · ${p.region}", color = Purple, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)); IconButton(onClick = favorite, modifier = Modifier.size(48.dp)) { Icon(if (saved) Icons.Rounded.Favorite else Icons.Outlined.FavoriteBorder, if (saved) "찜 해제" else "찜하기", tint = if (saved) Color(0xFFD76B95) else Muted, modifier = Modifier.size(21.dp)) } }
                 Text(p.title, fontSize = 15.sp, fontWeight = FontWeight.Bold, lineHeight = 21.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                Text(dateLabel(p), fontSize = 11.sp, color = Muted, modifier = Modifier.padding(top = 8.dp)); Text(p.venue.ifBlank { "공연장 정보 없음" }, fontSize = 11.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
+                Text(dateLabel(p), fontSize = 11.sp, color = Muted, modifier = Modifier.padding(top = 8.dp)); Text(venueLabel(p.venue), fontSize = 11.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
             }
         }
     }
@@ -196,16 +197,17 @@ class MainActivity : ComponentActivity() {
 @Composable fun EmptyState(title: String, body: String) { Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 44.dp), horizontalAlignment = Alignment.CenterHorizontally) { Surface(color = Lavender, shape = RoundedCornerShape(24.dp)) { Icon(Icons.Outlined.TheaterComedy, null, tint = Purple, modifier = Modifier.padding(20.dp).size(32.dp)) }; Text(title, fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 20.dp)); Text(body, fontSize = 13.sp, color = Muted, modifier = Modifier.padding(top = 8.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center) } }
 
 @Composable fun SearchScreen(catalog: Catalog?, filters: Filters, query: String, history: List<String>, favorites: List<Performance>, setQuery: (String) -> Unit, search: (String) -> Unit, clearHistory: (String?) -> Unit, onFilter: () -> Unit, change: (Filters) -> Unit, favorite: (Performance) -> Unit, open: (Performance) -> Unit) {
+    val keyboard = LocalSoftwareKeyboardController.current
     val list = filterPerformances(catalog?.performances.orEmpty(), query, filters)
     LazyColumn(contentPadding = PaddingValues(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { BrandHeader(filters.region, onFilter) }
-        item { Column(Modifier.padding(horizontal = 22.dp)) { Text("어떤 무대를 찾고 있나요?", fontWeight = FontWeight.Bold, fontSize = 25.sp, letterSpacing = (-.8).sp); Spacer(Modifier.height(16.dp)); Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { OutlinedTextField(value = query, onValueChange = setQuery, singleLine = true, placeholder = { Text("공연명이나 아티스트", fontSize = 13.sp) }, leadingIcon = { Icon(Icons.Outlined.Search, null, tint = Purple) }, trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { setQuery("") }) { Icon(Icons.Rounded.Close, "검색어 지우기") } }, shape = RoundedCornerShape(50), modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { search(query) })); FilledTonalIconButton(onClick = onFilter, modifier = Modifier.size(48.dp)) { Icon(Icons.Outlined.Tune, "필터") } } } }
+        item { Column(Modifier.padding(horizontal = 22.dp)) { Text("어떤 무대를 찾고 있나요?", fontWeight = FontWeight.Bold, fontSize = 25.sp, letterSpacing = (-.8).sp); Spacer(Modifier.height(16.dp)); Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { OutlinedTextField(value = query, onValueChange = setQuery, singleLine = true, placeholder = { Text("공연명이나 아티스트", fontSize = 13.sp) }, leadingIcon = { Icon(Icons.Outlined.Search, null, tint = Purple) }, trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { setQuery("") }) { Icon(Icons.Rounded.Close, "검색어 지우기") } }, shape = RoundedCornerShape(50), modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { search(query); keyboard?.hide() })); FilledTonalIconButton(onClick = onFilter, modifier = Modifier.size(48.dp)) { Icon(Icons.Outlined.Tune, "필터") } } } }
         item { GenreRow(filters, change) }; item { DateRow(filters, change, onFilter) }
         if (history.isNotEmpty()) item { Column(Modifier.padding(horizontal = 22.dp)) { SectionTitle("최근 검색어", action = "전체 삭제", onAction = { clearHistory(null) }); Spacer(Modifier.height(8.dp)); FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { history.forEach { word -> InputChip(selected = false, onClick = { search(word) }, label = { Text(word, fontSize = 12.sp) }, trailingIcon = { IconButton(onClick = { clearHistory(word) }, modifier = Modifier.size(24.dp)) { Icon(Icons.Rounded.Close, "검색 기록 삭제", modifier = Modifier.size(14.dp)) } }) } } } }
         item { SampleNotice(catalog?.sample == true) }
         item { Column(Modifier.padding(horizontal = 22.dp)) { SectionTitle("${if (query.isBlank()) "공연 둘러보기" else "검색 결과"}  ${list.size}", action = if (filters.descending) "종료일순 ↕" else "시작일순 ↕", onAction = { change(filters.copy(descending = !filters.descending)) }) } }
         if (list.isEmpty()) item { EmptyState("찾는 공연이 없어요", "검색어나 필터를 바꿔 다시 찾아보세요.") }
-        items(list, key = { it.id }) { p -> PerformanceRow(p, favorites.any { it.id == p.id }, { favorite(p) }, { search(query); open(p) }, Modifier.padding(horizontal = 22.dp)) }
+        items(list, key = { it.id }) { p -> PerformanceRow(p, favorites.any { it.id == p.id }, { favorite(p) }, { keyboard?.hide(); search(query); open(p) }, Modifier.padding(horizontal = 22.dp)) }
     }
 }
 
@@ -227,7 +229,7 @@ class MainActivity : ComponentActivity() {
         LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
             item { Box(Modifier.fillMaxWidth().background(Brush.verticalGradient(listOf(Lavender, Canvas))).padding(horizontal = 76.dp, vertical = 22.dp)) { PosterArt(p, Modifier.fillMaxWidth().aspectRatio(.72f).clip(RoundedCornerShape(22.dp))) } }
             item { Column(Modifier.padding(horizontal = 24.dp)) { Text("${p.genre}  /  ${p.region}  /  ${p.status}", color = Purple, fontSize = 12.sp, fontWeight = FontWeight.Bold); Text(p.title, fontSize = 27.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 36.sp, letterSpacing = (-.8).sp, modifier = Modifier.padding(top = 10.dp)); if (sample) Text("디자인 체험용 가상 공연입니다.", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 12.dp)) } }
-            item { Surface(color = Color.White, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, Lavender), modifier = Modifier.padding(horizontal = 22.dp)) { Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(17.dp)) { InfoRow(Icons.Outlined.CalendarMonth, "공연 기간", dateLabel(p)); InfoRow(Icons.Outlined.LocationOn, "공연장", p.venue); InfoRow(Icons.Outlined.Schedule, "관람 시간", p.runtime); InfoRow(Icons.Outlined.PersonOutline, "관람 연령", p.age); InfoRow(Icons.Outlined.ConfirmationNumber, "티켓 가격", p.ticketPrice) } } }
+            item { Surface(color = Color.White, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, Lavender), modifier = Modifier.padding(horizontal = 22.dp)) { Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(17.dp)) { InfoRow(Icons.Outlined.CalendarMonth, "공연 기간", dateLabel(p)); InfoRow(Icons.Outlined.LocationOn, "공연장", venueLabel(p.venue)); InfoRow(Icons.Outlined.Schedule, "관람 시간", p.runtime); InfoRow(Icons.Outlined.PersonOutline, "관람 연령", p.age); InfoRow(Icons.Outlined.ConfirmationNumber, "티켓 가격", p.ticketPrice) } } }
             item { Column(Modifier.padding(horizontal = 24.dp)) { SectionTitle("함께하는 아티스트"); Spacer(Modifier.height(12.dp)); Text(p.artists.joinToString(" · ").ifBlank { "출연진 정보가 제공되지 않았어요." }, color = Muted, fontSize = 14.sp, lineHeight = 24.sp) } }
             item { Column(Modifier.padding(horizontal = 24.dp)) { SectionTitle("공연 안내"); Spacer(Modifier.height(12.dp)); Text(p.description.ifBlank { "상세 소개는 예매처에서 확인해주세요." }, color = Muted, fontSize = 14.sp, lineHeight = 25.sp); if (p.schedule.isNotBlank()) Text("\n공연 일정\n${p.schedule}", color = Ink, fontSize = 13.sp, lineHeight = 23.sp) } }
             item { Text(if (sample) "MOA DESIGN PREVIEW" else "출처: (재)예술경영지원센터 공연예술통합전산망(www.kopis.or.kr)\n정보는 변경될 수 있으니 예매처에서 최종 확인해주세요.", color = Muted, fontSize = 11.sp, lineHeight = 18.sp, modifier = Modifier.padding(horizontal = 24.dp)) }

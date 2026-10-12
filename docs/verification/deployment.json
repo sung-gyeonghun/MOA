@@ -1,0 +1,15 @@
+{
+  "url": "https://sung-gyeonghun.github.io/MOA/",
+  "bootstrapRun": "https://github.com/sung-gyeonghun/MOA/actions/runs/38279518647",
+  "count": 2934,
+  "updatedAt": "2026-10-13T01:58:05+09:00",
+  "allMonthlyHashesVerified": true,
+  "daeguCount": 171,
+  "incrementalRun": "https://github.com/sung-gyeonghun/MOA/actions/runs/38280553834",
+  "incrementalRunSucceeded": true,
+  "refreshedCount": 168,
+  "reusedCount": 2766,
+  "lastFullSyncAt": "2026-10-13T01:13:54+09:00",
+  "scheduledEveryHours": 3,
+  "scheduledTriggerObserved": false
+}

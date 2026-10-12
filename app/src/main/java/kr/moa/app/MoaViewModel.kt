@@ -13,7 +13,10 @@ import kotlinx.coroutines.CancellationException
 class MoaViewModel @Inject constructor(private val repository: MoaRepository) : ViewModel() {
     val catalog = MutableStateFlow<Catalog?>(null)
     val preferences = repository.preferences.stateIn(viewModelScope, SharingStarted.Eagerly, Preferences())
-    val favorites = repository.favorites.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    val favorites = combine(repository.favorites, catalog) { saved, current ->
+        val latest = current?.performances?.associateBy { it.id }.orEmpty()
+        saved.map { latest[it.id] ?: it }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val filters = MutableStateFlow(Filters())
     val query = MutableStateFlow("")
     val busy = MutableStateFlow(false)

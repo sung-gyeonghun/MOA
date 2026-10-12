@@ -2,69 +2,59 @@
 
 보고 싶은 공연, 여기 다 모아. 전국 공연 탐색 Android 앱.
 
-## 실행
+## 설치와 사용
 
-Android Studio에서 이 폴더를 열고 Gradle 동기화 후 `app`을 실행합니다. JDK 17 이상, Android SDK 35, Android 10 이상 기기가 필요합니다.
+`dist/moa-preview.apk`를 Android 10 이상 기기에 설치합니다. 개발용 서명이며 Play 출시용 서명은 아닙니다.
+
+- **실제 국내 공연 2,934건**을 초기 데이터로 포함합니다. 대구 공연 171건.
+- 앱 실행 시 [공연 데이터 서버](https://sung-gyeonghun.github.io/MOA/)에서 자동 갱신합니다. 앱에 API 키를 입력할 필요가 없습니다.
+- 지역·복수 장르·오늘/주/주말/월/직접 날짜 필터, 공연명·출연진 검색, 상세·공식 예매처 이동, 찜을 제공합니다.
+- 마지막 정상 목록과 찜은 Room에, 선호와 검색 기록은 DataStore에 저장됩니다.
+- 오프라인에서도 초기 데이터 또는 마지막 정상 캐시를 볼 수 있습니다.
+- Pretendard Variable, 제공된 모아 로고·아이콘, 라벤더·핑크 테마를 적용했습니다.
+
+**Debug 빌드**는 개발·UI 테스트용 가상 공연을 기본으로 사용합니다. 실제 데이터로 사용하는 설치 파일은 **Preview APK**입니다. 이전 체험용 찜은 체험용으로 표시됩니다.
+
+## 데이터 운영
+
+KOPIS → Python / GitHub Actions → GitHub Pages JSON → Android.
+
+- 저장소 Actions Secret `KOPIS_API_KEY` 등록 완료. 키는 소스·JSON·APK에 포함하지 않습니다.
+- GitHub Pages의 workflow 배포 설정 완료.
+- `17 */3 * * *` UTC 예약 실행과 수동 실행 제공. 예약 시각은 지연될 수 있습니다.
+- 변경일 필터를 실제 API로 확인했습니다. 정상 배포 캐시를 재사용하고 변경된 상세·새 공연을 갱신합니다. 7일마다 전체 상세 동기화합니다.
+- KOPIS 상세 API의 일시적 HTTP 400을 관찰해 재시도와 중간 저장을 보강했습니다.
+- 수집·검증 실패 시 배포하지 않습니다. 앱은 파일 SHA256·버전을 확인한 후 목록과 갱신 정보를 한 트랜잭션으로 저장합니다.
+- 현재 API 지역 표기 `전남광주통합특별시`는 앱에서 `전남광주`로 표시합니다. 원본의 해외 4건은 국내 범위에서 제외했습니다.
+
+[배포 확인](https://github.com/sung-gyeonghun/MOA/actions/runs/38279518647) · [실제 증분 갱신 성공](https://github.com/sung-gyeonghun/MOA/actions/runs/38280553834)
+
+증분 검증 실행은 상세 168건을 갱신하고 2,766건을 재사용했습니다. 실제 예약 이벤트가 실행된 이력은 아직 관찰하지 않았습니다.
+
+## 개발·검증
+
+Kotlin / Compose Material 3 / MVVM / Coroutines + Flow / Hilt / Navigation / Retrofit + OkHttp / Kotlinx Serialization / Room / DataStore / Coil.
+
+Windows 한글 경로에서 Gradle 테스트 클래스 로딩 오류가 발생하면 전용 ASCII 빌드 경로를 사용하는 아래 도우미를 실행합니다.
 
 ```powershell
-./gradlew.bat :app:assembleDebug
-./gradlew.bat :app:assemblePreview
-./gradlew.bat :app:assembleRelease :app:bundleRelease
-./gradlew.bat :app:testDebugUnitTest :app:lintDebug
-./gradlew.bat :app:connectedDebugAndroidTest
+./tools/build-windows.ps1 -VerifyDevice -ReleaseArtifacts
 python -m unittest discover -s tools/tests -v
+python tools/validate_snapshot.py public
 ```
 
-Windows에서 한글 경로로 인해 Gradle 테스트가 `ClassNotFoundException`으로 실패한다면 `tools/build-windows.ps1`을 실행하세요. ASCII 경로의 전용 빌드 폴더에서 검증하고 APK를 `dist`에 복사합니다. 에뮬레이터 자동 테스트까지 포함하려면 `tools/build-windows.ps1 -VerifyDevice`를 실행합니다.
+Android Studio에서도 프로젝트를 열 수 있습니다. JDK 17 이상과 Android SDK 35가 필요합니다.
 
-출시 준비 산출물까지 다시 생성하려면 `tools/build-windows.ps1 -ReleaseArtifacts`를 실행합니다. 자세한 실제 데이터 연결 절차는 [docs/data_connection.md](docs/data_connection.md)에 있습니다.
+검증: Kotlin 테스트 5개, Python 테스트 16개, Android 에뮬레이터 테스트 12개 통과. 실제 공연 상세·찜·프로세스 종료 후 유지·오프라인 목록과 공개 JSON 파일의 해시를 추가 확인했습니다. 실제 Android 기기와 Android 10 기기 시험은 아직 하지 않았습니다.
 
-## 포함 기능
+`docs/verification`에 테스트 XML·배포·실제 데이터·기기 확인 및 파일 SHA256 기록이 있습니다. `docs/screenshots`에 실제 공연 데이터로 캡처한 화면이 있습니다.
 
-- 라벤더·핑크 브랜드 테마, 모아 로고 및 아이콘
-- 발견 / 검색 / 찜 / 설정 / 공연 상세
-- 전국 시·도 선택, 복수 장르 선택, 날짜 기간 겹침 필터, 직접 날짜 선택
-- 공연명·출연진 검색, 검색 기록 삭제, 시작일·종료일 정렬
-- Room 기반 오프라인 목록 캐시와 찜, DataStore 선호 설정
-- 공식 예매처 선택 및 외부 브라우저 연결, 예매 URL 누락 안내
-- HTTPS JSON 연결, 갱신 실패 시 이전 데이터 유지
-- 목록과 갱신 정보의 트랜잭션 저장, 다운로드 중 배포 버전 변경 감지
-- KOPIS Python 수집·정규화·월별 중복 인덱싱, GitHub Pages 예약 배포 워크플로
+## 산출물과 출시 전 단계
 
-첫 실행은 디자인 체험용 **가상 공연 12개**를 제공합니다. 실제 공연·가격·예매 정보가 아니며 예매 버튼을 비활성화합니다. 사용자 API 키를 앱에 저장하지 않습니다.
+- `dist/moa-preview.apk`: 실제 공연 데이터 포함, 최적화된 개발용 설치 APK
+- `dist/moa-debug.apk`: 개발·테스트 APK
+- `dist/moa-release-unsigned.apk`, `dist/moa-release-unsigned.aab`: 미서명 출시 준비 산출물
 
-## 실제 공연 데이터 연결
+일반 공개/Play 출시 전 소유자의 서명키, 실기기 시험, 개인정보 및 콘텐츠 이용 권한 검토가 필요합니다. 앱의 데이터 출처 표시는 [KOPIS OpenAPI 안내](https://kopis.or.kr/por/cs/openapi/openApiInfo.do?menuId=MNU_00077)를 반영했고, [공통코드](https://www.kopis.or.kr/upload/openApi/공연예술통합전산망OpenAPI공통코드.pdf)의 장르 코드를 사용합니다.
 
-1. [KOPIS OpenAPI](https://www.kopis.or.kr/por/cs/openapi/openApiInfo.do?menuId=MNU_00074) 서비스키를 발급하고 JSON 재배포·포스터 사용 조건을 확인합니다.
-2. GitHub 저장소 Secrets에 `KOPIS_API_KEY`를 등록합니다.
-3. GitHub Settings → Pages → Source를 **GitHub Actions**로 설정합니다.
-4. `.github/workflows/data.yml`을 저장소에 올린 뒤 `Collect and publish performances`를 수동 실행합니다.
-5. 앱 설정에서 `https://sung-gyeonghun.github.io/MOA/`를 저장하고 데이터 갱신을 누릅니다. 실제 배포 URL은 Actions 결과로 확인하세요.
-
-예약 수집은 UTC 기준 3시간마다 17분에 실행합니다. GitHub 실행이 지연될 수 있습니다. 현재 수집은 6개월의 예정·진행 공연 전체 동기화입니다. `afterdate` 증분 수집은 실제 API 검증 전까지 활성화하지 않습니다. 한 요청이라도 실패하거나 빈 데이터이면 배포하지 않아 이전 Pages 배포가 유지됩니다.
-
-## 구조
-
-`app/src/main/java/kr/moa/app/data` : 정규화 모델, 필터, Retrofit·Room·DataStore 저장소
-
-`MoaViewModel.kt` : 상태 및 사용자 동작 · `MainActivity.kt` : Compose 화면 / Navigation
-
-`MoaApplication.kt` : Hilt 의존성 주입 · `tools/collect.py` : 서버 없는 데이터 파이프라인
-
-KOPIS 필드 매핑 기준은 [공식 개발 가이드](https://kopis.or.kr/upload/openApi/공연예술통합전산망OpenAPI개발가이드.pdf)입니다.
-
-## 배포 전 남은 검증
-
-- 실제 서비스키로 데이터 커버리지·예매 링크·HTTP 포스터의 HTTPS 대응 확인
-- 데이터 이용 및 재배포 조건 확인, 실제 전국 데이터 크기와 요청량 측정
-- 실제 Android 기기 검증, 배포용 서명키 준비 및 Play 정책 검토
-
-`dist/moa-preview.apk`는 용량을 줄인 설치용 APK이고 `dist/moa-debug.apk`는 디버깅용 APK입니다. 둘 다 개발용 서명입니다. Play 출시용으로 사용하지 마세요. 외부 서비스 설정과 실제 API 검증을 마치기 전에는 운영 배포가 완료된 상태가 아닙니다.
-
-`dist/moa-release-unsigned.apk`와 `dist/moa-release-unsigned.aab`는 출시 준비용 미서명 산출물입니다. 설치·스토어 업로드 전 소유자의 정식 서명키 설정이 필요합니다. 저장소에 서명키를 포함하지 않았습니다.
-
-## 화면 미리보기
-
-`docs/screenshots`에 에뮬레이터에서 캡처한 홈·검색·상세·찜·설정·필터 화면이 있습니다.
-
-HTTPS 모의 서버와 실제 Room/DataStore를 이용해 오류 응답·잘못된 JSON·빈 데이터·버전 변경 시 캐시 유지, 오프라인 재조회, 설정과 찜 재복원, 기존 DB 마이그레이션을 검증합니다. Android 테스트는 에뮬레이터 또는 연결된 개발용 기기가 필요합니다.
+Pretendard는 SIL Open Font License 1.1로 배포되며 라이선스를 APK의 `assets/licenses/pretendard.txt`에 포함했습니다.

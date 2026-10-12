@@ -35,6 +35,8 @@ class MoaFlowTest {
     @Test fun unmatchedSearchShowsEmptyState() {
         compose.onNodeWithText("검색", useUnmergedTree = true).performClick()
         compose.onNode(hasSetTextAction()).performTextInput("존재하지않는공연123")
+        compose.onNode(hasSetTextAction()).performImeAction()
+        compose.waitUntil(10000) { compose.onAllNodesWithText("찾는 공연이 없어요").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithText("찾는 공연이 없어요").assertExists()
     }
     @Test fun regionAndMultipleGenresApplyAndSurviveRecreation() {

@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-10-13T01:13:54+09:00",
-  "count": 2938,
+  "updatedAt": "2026-10-13T01:58:05+09:00",
+  "count": 2934,
   "regions": {
     "경북": 96,
     "서울": 1180,
@@ -16,15 +16,14 @@
     "충북": 43,
     "경남": 132,
     "부산": 176,
-    "전남광주통합특별시": 133,
-    "세종": 36,
-    "해외": 4
+    "전남광주": 133,
+    "세종": 36
   },
   "genres": {
     "뮤지컬": 586,
     "클래식": 930,
     "연극": 405,
-    "콘서트": 588,
+    "콘서트": 584,
     "복합": 70,
     "무용": 101,
     "국악": 151,
@@ -34,24 +33,15 @@
     "GGGA": 586,
     "CCCA": 930,
     "AAAA": 405,
-    "CCCD": 588,
+    "CCCD": 584,
     "EEEA": 70,
     "BBBC": 95,
     "CCCC": 151,
     "EEEB": 107,
     "BBBR": 6
   },
-  "withBookingLinks": 2938,
-  "withArtists": 2104,
-  "withPrices": 2935,
-  "spanningMonths": 388,
-  "monthlyBytes": {
-    "performances/2026-10.json": 1533285,
-    "performances/2026-11.json": 1005279,
-    "performances/2026-12.json": 489943,
-    "performances/2027-01.json": 54012,
-    "performances/2027-02.json": 14591,
-    "performances/2027-03.json": 6029
-  },
-  "bootstrapBytes": 2693161
+  "withBookingLinks": 2934,
+  "withArtists": 2102,
+  "withPrices": 2931,
+  "spanningMonths": 388
 }

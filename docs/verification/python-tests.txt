@@ -1,13 +1,21 @@
+test_afterdate_passed_and_duplicate_listings_deduplicated (test_collect.CollectorTests.test_afterdate_passed_and_duplicate_listings_deduplicated) ... ok
 test_api_failure_does_not_print_service_key (test_collect.CollectorTests.test_api_failure_does_not_print_service_key) ... ok
+test_changed_item_cannot_reuse_checkpoint_from_previous_publication (test_collect.CollectorTests.test_changed_item_cannot_reuse_checkpoint_from_previous_publication) ... ok
+test_checkpoint_resumes_validated_details_after_interrupted_run (test_collect.CollectorTests.test_checkpoint_resumes_validated_details_after_interrupted_run) ... ok
 test_cross_month_performance_is_in_both_files (test_collect.CollectorTests.test_cross_month_performance_is_in_both_files) ... ok
+test_current_kopis_merged_region_and_domestic_scope (test_collect.CollectorTests.test_current_kopis_merged_region_and_domestic_scope) ... ok
+test_detail_hall_suffix_does_not_invalidate_unchanged_summary (test_collect.CollectorTests.test_detail_hall_suffix_does_not_invalidate_unchanged_summary) ... ok
 test_empty_collection_preserves_existing_files (test_collect.CollectorTests.test_empty_collection_preserves_existing_files) ... ok
 test_failed_swap_restores_previous_publication (test_collect.CollectorTests.test_failed_swap_restores_previous_publication) ... ok
+test_full_sync_refetches_even_unchanged_items (test_collect.CollectorTests.test_full_sync_refetches_even_unchanged_items) ... ok
+test_incremental_refetches_modified_and_new_details (test_collect.CollectorTests.test_incremental_refetches_modified_and_new_details) ... ok
+test_incremental_reuses_unchanged_and_drops_removed_ids (test_collect.CollectorTests.test_incremental_reuses_unchanged_and_drops_removed_ids) ... ok
 test_normalization_and_safe_booking_links (test_collect.CollectorTests.test_normalization_and_safe_booking_links) ... ok
 test_output_cannot_replace_sources_or_unrelated_files (test_collect.CollectorTests.test_output_cannot_replace_sources_or_unrelated_files) ... ok
 test_reversed_dates_rejected (test_collect.CollectorTests.test_reversed_dates_rejected) ... ok
 test_swap_uses_complete_validated_publication (test_collect.CollectorTests.test_swap_uses_complete_validated_publication) ... ok
 
 ----------------------------------------------------------------------
-Ran 8 tests in 0.033s
+Ran 16 tests in 0.073s
 
 OK
