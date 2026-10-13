@@ -1,6 +1,6 @@
 {
   "verifiedAt": "2026-10-13T12:24:52+09:00",
-  "version": "1.0.1",
+  "version": "Preview 1.0.2; other artifacts 1.0.1",
   "artifacts": [
     {
       "file": "moa-debug.apk",
@@ -9,8 +9,9 @@
     },
     {
       "file": "moa-preview.apk",
-      "bytes": 7910795,
-      "sha256": "22dead5f0be29082e8f5486f5e8b16f4d00cdb77840f6df0a4cffebcd445f0c5"
+      "bytes": 7927175,
+      "sha256": "71161bb02dea6f434fe87d27bba57454a2a84381faa4c7c96c39577531088b05",
+      "version": "1.0.2"
     },
     {
       "file": "moa-release-unsigned.aab",

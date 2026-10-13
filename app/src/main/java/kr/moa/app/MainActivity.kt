@@ -127,7 +127,7 @@ class MainActivity : ComponentActivity() {
             item { Column(Modifier.padding(horizontal = 22.dp)) { SectionTitle("모든 공연 둘러보기", "마음에 드는 무대를 찜해보세요", if (filters.descending) "종료일순 ↕" else "시작일순 ↕") { change(filters.copy(descending = !filters.descending)) } } }
             items(list, key = { it.id }) { p -> PerformanceRow(p, favorites.any { it.id == p.id }, { favorite(p) }, { open(p) }, Modifier.padding(horizontal = 22.dp)) }
         }
-        item { Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp), horizontalAlignment = Alignment.CenterHorizontally) { Text("보고 싶은 공연, 여기 다 모아.", color = Muted, fontSize = 12.sp); TextButton(onClick = refresh, enabled = !busy) { Text(if (busy) "불러오는 중…" else "공연 정보 새로고침", fontSize = 12.sp) } } }
+        item { Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp), horizontalAlignment = Alignment.CenterHorizontally) { Text("보고 싶은 공연, 여기 다 모아.", color = Muted, fontSize = 12.sp); if (!catalog?.updatedAt.isNullOrBlank()) Text("최종 갱신 · ${updatedLabel(catalog!!.updatedAt)}", color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 6.dp)); TextButton(onClick = refresh, enabled = !busy) { Text(if (busy) "불러오는 중…" else "공연 정보 새로고침", fontSize = 12.sp) } } }
     }
 }
 

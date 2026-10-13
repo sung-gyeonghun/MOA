@@ -15,7 +15,7 @@
 ![Data](https://img.shields.io/badge/Data-KOPIS-F4A6C1?style=flat-square)
 [![Data workflow](https://github.com/sung-gyeonghun/MOA/actions/workflows/data.yml/badge.svg)](https://github.com/sung-gyeonghun/MOA/actions/workflows/data.yml)
 
-[**📥 Android APK 다운로드**](https://github.com/sung-gyeonghun/MOA/releases/download/v1.0.1-preview.1/moa-preview.apk) · [공연 데이터](https://sung-gyeonghun.github.io/MOA/) · [데이터 갱신 이력](https://github.com/sung-gyeonghun/MOA/actions/workflows/data.yml) · [요구사항](docs/performance_app_PRD_v1.0.md) · [검증 기록](docs/verification)
+[**📥 Android APK 다운로드**](https://github.com/sung-gyeonghun/MOA/releases/download/v1.0.2-preview.1/moa-preview.apk) · [공연 데이터](https://sung-gyeonghun.github.io/MOA/) · [데이터 갱신 이력](https://github.com/sung-gyeonghun/MOA/actions/workflows/data.yml) · [요구사항](docs/performance_app_PRD_v1.0.md) · [검증 기록](docs/verification)
 
 <img src="image/app_description.png" alt="모아 브랜드 콘셉트 — 전국의 공연을 한곳에" width="100%" />
 
@@ -99,12 +99,12 @@
 
 **실제 데이터로 사용하려면 `moa-preview.apk`를 설치하세요.** Android 10 이상을 지원합니다.
 
-1. 휴대폰에서 [**모아 Preview APK 다운로드**](https://github.com/sung-gyeonghun/MOA/releases/download/v1.0.1-preview.1/moa-preview.apk)를 누릅니다. PC로 받았다면 파일을 휴대폰으로 옮깁니다.
+1. 휴대폰에서 [**모아 Preview APK 다운로드**](https://github.com/sung-gyeonghun/MOA/releases/download/v1.0.2-preview.1/moa-preview.apk)를 누릅니다. PC로 받았다면 파일을 휴대폰으로 옮깁니다.
 2. 파일 앱에서 APK를 열고, 필요한 경우 해당 출처의 앱 설치를 허용합니다.
 3. 기존 모아가 설치되어 있다면 같은 개발용 서명의 APK로 업데이트 설치합니다.
 4. 앱을 열면 저장된 목록을 먼저 표시하고 인터넷 연결 시 최신 데이터를 받아옵니다.
 
-사용자에게 KOPIS 키나 데이터 주소 입력을 요구하지 않습니다. 수동 갱신은 메인 목록 하단의 **공연 정보 새로고침**을 사용합니다.
+사용자에게 KOPIS 키나 데이터 주소 입력을 요구하지 않습니다. 메인 목록 하단에서 최종 갱신 시각을 확인할 수 있습니다. 수동 갱신은 메인 목록 하단의 **공연 정보 새로고침**을 사용합니다.
 
 | 산출물 | 용도 |
 | :--- | :--- |
@@ -113,7 +113,7 @@
 | `dist/moa-release-unsigned.apk` | 정식 서명 전의 Release APK |
 | `dist/moa-release-unsigned.aab` | Play 제출 준비용 미서명 App Bundle |
 
-`dist/`는 Git에서 제외되어 있지만 설치용 Preview APK는 [GitHub Release](https://github.com/sung-gyeonghun/MOA/releases/tag/v1.0.1-preview.1)에 별도로 배포합니다. 저장소를 복제하면 APK가 함께 내려오지는 않습니다. 직접 빌드하려면 아래 방법을 사용하세요. 현재 Play Store에 출시된 앱은 아닙니다. 파일 크기와 SHA256은 [산출물 기록](docs/verification/artifacts.json)에서 확인할 수 있습니다. 현재 배포 버전은 **1.0.1 Preview**입니다. 홈 검색창 제거, 키보드 하단 메뉴 처리와 다크모드를 포함합니다.
+`dist/`는 Git에서 제외되어 있지만 설치용 Preview APK는 [GitHub Release](https://github.com/sung-gyeonghun/MOA/releases/tag/v1.0.2-preview.1)에 별도로 배포합니다. 저장소를 복제하면 APK가 함께 내려오지는 않습니다. 직접 빌드하려면 아래 방법을 사용하세요. 현재 Play Store에 출시된 앱은 아닙니다. 파일 크기와 SHA256은 [산출물 기록](docs/verification/artifacts.json)에서 확인할 수 있습니다. 현재 배포 버전은 **1.0.2 Preview**입니다. 홈 검색창 제거, 키보드 하단 메뉴 처리와 다크모드를 포함합니다.
 
 ## 🧩 앱을 구성하는 기술
 
@@ -227,7 +227,8 @@ Windows 한글 경로에서 발생한 Gradle 테스트 클래스 로딩 문제�
 - [x] 예약으로 시작한 데이터 갱신·배포 성공 확인
 - [x] Android 10 에뮬레이터 주요 흐름 검증
 - [x] 설치용 Preview APK 및 Release 준비 산출물 생성
-- [ ] 실제 휴대폰에서 주요 기능·브라우저·오프라인·접근성 전체 시험
+- [x] 실제 휴대폰에서 검색·상세·예매 링크·찜 유지·오프라인 조회 — [사용자 확인](docs/verification/physical-device-user-confirmation.md)
+- [ ] 실제 휴대폰 성능 계측·스크린 리더 사용성 확인
 - [ ] 운영자 정보와 공개 개인정보처리방침, Play Data safety 작성
 - [ ] 개별 포스터와 데이터 재배포 이용 권한 최종 확인
 - [ ] 소유자 정식 서명 및 Play 제출

@@ -16,8 +16,8 @@
 
 ## 검증과 산출물
 
-- Android 에뮬레이터 테스트 12개 / Kotlin 5개 / Python 16개 통과
-- Android 10(API 29)에서도 동일한 Android 테스트 12개 통과. Preview APK 설치와 실제 2,934건 표시, 오프라인 재실행 확인.
+- 최신 Android 10 연결 테스트 15개 / Kotlin 8개 / Python 16개 통과
+- Android 10(API 29)에서 최신 Android 테스트 15개 통과. Preview APK 설치와 실제 2,934건 표시, 오프라인 재실행 확인.
 - 실제 공연 상세·찜·프로세스 종료 후 찜 유지·오프라인 목록 확인
 - Preview APK 설치, 공개 JSON 전 파일의 SHA256 확인
 - Debug / Preview / 미서명 Release APK 및 AAB 생성
@@ -28,8 +28,10 @@
 
 ## 아직 완료되지 않은 출시 검증
 
-실제 Android 휴대폰 시험, 소유자 정식 서명키, 일반 공개/Play 정책 및 콘텐츠 이용 권한 검토. Android 10은 에뮬레이터로 검증했으며 Play 출시를 완료한 상태는 아닙니다.
+소유자 정식 서명키, 일반 공개/Play 정책 및 콘텐츠 이용 권한 검토. Android 10은 에뮬레이터로 검증했으며 Play 출시를 완료한 상태는 아닙니다.
 
 최신 UI: 배너 지역 알약 버튼, 지역·장르 복수 선택 드롭다운, 월 단위 기간 선택, 설정 주소 제거. 변경 검증은 Kotlin 8개·Android 10 연결 13개 통과. `docs/verification/dropdown-month-update.md` 참고.
 
-설치용 Preview APK는 GitHub Release `v1.0.0-preview.1`로 배포하며 README에서 직접 다운로드합니다.
+설치용 Preview APK는 GitHub Release `v1.0.2-preview.1`로 배포하며 README에서 직접 다운로드합니다.
+
+실기기 검증: 사용자가 2026-10-13 검색·상세·예매 링크 열기·찜 후 종료/재실행·비행기 모드 조회 모두 정상이라고 확인했다. 기종·OS·측정 성능은 별도로 수집하지 않았다. 다크모드 저장과 키보드 하단 메뉴 처리는 `appearance-keyboard-tests.xml`에서 확인했다.
