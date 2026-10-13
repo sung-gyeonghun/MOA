@@ -10,11 +10,14 @@
   "refreshedCount": 168,
   "reusedCount": 2766,
   "lastFullSyncAt": "2026-10-13T01:13:54+09:00",
-  "scheduledEveryHours": 3,
+  "scheduledEveryHours": 24,
   "scheduledTriggerObserved": true,
   "scheduledRun": "https://github.com/sung-gyeonghun/MOA/actions/runs/38328864571",
   "scheduledRunSucceeded": true,
   "scheduledUpdatedAt": "2026-10-13T09:52:25+09:00",
   "scheduledCount": 2934,
-  "scheduledMonthlyHashesVerified": true
+  "scheduledMonthlyHashesVerified": true,
+  "cronUtc": "17 0 * * *",
+  "scheduleKst": "매일 09:17",
+  "observedScheduledRunUsedPreviousThreeHourSchedule": true
 }

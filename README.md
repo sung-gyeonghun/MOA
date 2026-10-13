@@ -15,7 +15,7 @@
 ![Data](https://img.shields.io/badge/Data-KOPIS-F4A6C1?style=flat-square)
 [![Data workflow](https://github.com/sung-gyeonghun/MOA/actions/workflows/data.yml/badge.svg)](https://github.com/sung-gyeonghun/MOA/actions/workflows/data.yml)
 
-[공연 데이터](https://sung-gyeonghun.github.io/MOA/) · [데이터 갱신 이력](https://github.com/sung-gyeonghun/MOA/actions/workflows/data.yml) · [요구사항](docs/performance_app_PRD_v1.0.md) · [검증 기록](docs/verification)
+[**📥 Android APK 다운로드**](https://github.com/sung-gyeonghun/MOA/releases/download/v1.0.0-preview.1/moa-preview.apk) · [공연 데이터](https://sung-gyeonghun.github.io/MOA/) · [데이터 갱신 이력](https://github.com/sung-gyeonghun/MOA/actions/workflows/data.yml) · [요구사항](docs/performance_app_PRD_v1.0.md) · [검증 기록](docs/verification)
 
 <img src="image/app_description.png" alt="모아 브랜드 콘셉트 — 전국의 공연을 한곳에" width="100%" />
 
@@ -86,7 +86,7 @@
 
 **실제 데이터로 사용하려면 `moa-preview.apk`를 설치하세요.** Android 10 이상을 지원합니다.
 
-1. 로컬 빌드 결과 `dist/moa-preview.apk`를 휴대폰으로 옮깁니다.
+1. 휴대폰에서 [**모아 Preview APK 다운로드**](https://github.com/sung-gyeonghun/MOA/releases/download/v1.0.0-preview.1/moa-preview.apk)를 누릅니다. PC로 받았다면 파일을 휴대폰으로 옮깁니다.
 2. 파일 앱에서 APK를 열고, 필요한 경우 해당 출처의 앱 설치를 허용합니다.
 3. 기존 모아가 설치되어 있다면 같은 개발용 서명의 APK로 업데이트 설치합니다.
 4. 앱을 열면 저장된 목록을 먼저 표시하고 인터넷 연결 시 최신 데이터를 받아옵니다.
@@ -100,7 +100,7 @@
 | `dist/moa-release-unsigned.apk` | 정식 서명 전의 Release APK |
 | `dist/moa-release-unsigned.aab` | Play 제출 준비용 미서명 App Bundle |
 
-`dist/`는 Git에서 제외되어 있습니다. 저장소를 복제하면 APK가 함께 내려오지 않으며 아래 방법으로 빌드해야 합니다. 현재 Play Store에 출시된 앱은 아닙니다. 파일 크기와 SHA256은 [산출물 기록](docs/verification/artifacts.json)에서 확인할 수 있습니다. 최신 지역 버튼 디자인은 Preview APK에 반영되어 있습니다.
+`dist/`는 Git에서 제외되어 있지만 설치용 Preview APK는 [GitHub Release](https://github.com/sung-gyeonghun/MOA/releases/tag/v1.0.0-preview.1)에 별도로 배포합니다. 저장소를 복제하면 APK가 함께 내려오지는 않습니다. 직접 빌드하려면 아래 방법을 사용하세요. 현재 Play Store에 출시된 앱은 아닙니다. 파일 크기와 SHA256은 [산출물 기록](docs/verification/artifacts.json)에서 확인할 수 있습니다. 최신 지역 버튼 디자인은 Preview APK에 반영되어 있습니다.
 
 ## 🧩 앱을 구성하는 기술
 
@@ -142,7 +142,7 @@ flowchart LR
 
 **앱을 다시 배포하지 않아도 공연 정보는 갱신됩니다.** Actions가 데이터를 생성·배포하고, 앱이 실행 또는 새로고침 시 공개 JSON을 받아옵니다. 닫힌 앱을 서버 갱신 때마다 깨우는 방식은 아닙니다.
 
-- **3시간 간격 예약:** 한국 시간 00:17 · 03:17 · 06:17 · 09:17 · 12:17 · 15:17 · 18:17 · 21:17. GitHub 사정에 따라 실제 실행은 지연될 수 있습니다.
+- **하루 1회 예약:** 매일 한국 시간 **오전 09:17** (UTC 00:17). GitHub 사정에 따라 실제 실행은 지연될 수 있습니다.
 - **증분 수집:** 이전 정상 스냅샷을 재사용하고, 새 공연·변경된 상세 등을 갱신합니다. 7일마다 전체 상세 동기화를 수행합니다.
 - **실패 시 보존:** 수집·검증이 실패하면 배포를 진행하지 않습니다. 재시도와 중간 저장으로 일시적 API 오류에 대응합니다.
 - **앱에서도 검증:** 월별 파일의 SHA256과 데이터 버전을 확인하고, 검증된 목록과 갱신 시각을 Room 트랜잭션으로 교체합니다.
@@ -155,7 +155,7 @@ flowchart LR
 | 예약 실행 | [예약으로 시작한 수집·배포 성공](https://github.com/sung-gyeonghun/MOA/actions/runs/38328864571) |
 | 공개 스냅샷 | [manifest.json](https://sung-gyeonghun.github.io/MOA/manifest.json)에서 현재 버전·갱신 시각 확인 |
 
-수치는 검증 시점의 스냅샷이며 운영 중 달라질 수 있습니다. 2026-10-13 확인한 예약 배포의 데이터 갱신 시각은 한국 시간 **09:52:25**입니다. 상세 설정은 [워크플로](.github/workflows/data.yml)와 [데이터 연결 안내](docs/data_connection.md)를 참고하세요.
+수치는 검증 시점의 스냅샷이며 운영 중 달라질 수 있습니다. 2026-10-13 확인한 예약 배포의 데이터 갱신 시각은 한국 시간 **09:52:25**입니다. 이 실행은 이전 3시간 주기의 근거이며, 현재 설정은 하루 1회로 변경했습니다. 상세 설정은 [워크플로](.github/workflows/data.yml)와 [데이터 연결 안내](docs/data_connection.md)를 참고하세요.
 
 <details>
 <summary><strong>데이터 범위와 원본 정보의 한계</strong></summary>
