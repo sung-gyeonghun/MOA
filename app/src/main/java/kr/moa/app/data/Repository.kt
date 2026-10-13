@@ -65,7 +65,7 @@ object StorageModule {
     @Provides @Singleton fun settings(@ApplicationContext context: Context): DataStore<StoredPreferences> = context.settings
 }
 
-data class Preferences(val region: String = "전국", val genres: Set<String> = emptySet(), val endpoint: String = "", val history: List<String> = emptyList(), val updatedAt: String = "", val sample: Boolean = true)
+data class Preferences(val region: String = "전국", val genres: Set<String> = emptySet(), val endpoint: String = "", val history: List<String> = emptyList(), val updatedAt: String = "", val sample: Boolean = true, val selectedRegions: Set<String> = emptySet())
 
 @Singleton
 class MoaRepository @Inject constructor(
@@ -75,13 +75,14 @@ class MoaRepository @Inject constructor(
     private val settings: DataStore<StoredPreferences>
 ) {
     private val dao = database.dao()
+    private val regionsKey = stringSetPreferencesKey("selected_regions")
     private val regionKey = stringPreferencesKey("region")
     private val genresKey = stringSetPreferencesKey("genres")
     private val endpointKey = stringPreferencesKey("endpoint")
     private val historyKey = stringPreferencesKey("history")
     private val updatedKey = stringPreferencesKey("updated")
     private val sampleKey = booleanPreferencesKey("sample")
-    val preferences = settings.data.map { p -> Preferences((p[regionKey] ?: "전국").let { if (it in setOf("광주", "전남", "전남광주통합특별시")) "전남광주" else it }, p[genresKey] ?: emptySet(), p[endpointKey] ?: if (BuildConfig.DEBUG) "" else "https://sung-gyeonghun.github.io/MOA/", runCatching { json.decodeFromString<List<String>>(p[historyKey] ?: "[]") }.getOrDefault(emptyList()), p[updatedKey] ?: "", p[sampleKey] ?: true) }
+    val preferences = settings.data.map { p -> Preferences((p[regionKey] ?: "전국").let { if (it in setOf("광주", "전남", "전남광주통합특별시")) "전남광주" else it }, p[genresKey] ?: emptySet(), p[endpointKey] ?: if (BuildConfig.DEBUG) "" else "https://sung-gyeonghun.github.io/MOA/", runCatching { json.decodeFromString<List<String>>(p[historyKey] ?: "[]") }.getOrDefault(emptyList()), p[updatedKey] ?: "", p[sampleKey] ?: true, (p[regionsKey] ?: setOf(p[regionKey] ?: "전국")).filter { it != "전국" }.map { if (it in setOf("광주", "전남", "전남광주통합특별시")) "전남광주" else it }.toSet()) }
     val favorites = dao.favorites().map { list -> list.mapNotNull { runCatching { json.decodeFromString<Performance>(it.payload) }.getOrNull() } }
     suspend fun initial(): Catalog = withContext(Dispatchers.IO) {
         val saved = dao.catalog().mapNotNull { runCatching { json.decodeFromString<Performance>(it.payload) }.getOrNull() }
@@ -127,7 +128,7 @@ class MoaRepository @Inject constructor(
         Catalog(manifest.updatedAt, all, false)
     }
     suspend fun favorite(p: Performance) { dao.toggleFavorite(Favorite(p.id, json.encodeToString(p))) }
-    suspend fun setDefaults(region: String, genres: Set<String>) { settings.edit { it[regionKey] = region; it[genresKey] = genres } }
+    suspend fun setDefaults(region: String, genres: Set<String>, selectedRegions: Set<String> = if (region == "전국") emptySet() else setOf(region)) { settings.edit { it[regionKey] = region; it[genresKey] = genres; it[regionsKey] = selectedRegions } }
     suspend fun setEndpoint(url: String) { settings.edit { it[endpointKey] = url.trim() } }
     suspend fun history(word: String) { if (word.isNotBlank()) settings.edit { p -> val old = runCatching { json.decodeFromString<List<String>>(p[historyKey] ?: "[]") }.getOrDefault(emptyList()); p[historyKey] = json.encodeToString((listOf(word.trim()) + old).distinct().take(10)) } }
     suspend fun clearHistory(word: String? = null) { settings.edit { p -> val old = runCatching { json.decodeFromString<List<String>>(p[historyKey] ?: "[]") }.getOrDefault(emptyList()); p[historyKey] = json.encodeToString(if (word == null) emptyList() else old.filterNot { it == word }) } }

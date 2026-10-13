@@ -1,26 +1,27 @@
 {
-  "verifiedAt": "2026-10-13T02:16:39+09:00",
+  "verifiedAt": "2026-10-13T11:44:17+09:00",
   "artifacts": [
     {
       "file": "moa-debug.apk",
       "bytes": 71189595,
-      "sha256": "51ad8042091027457faeaebc97219324652da945b1307580df63009b67c61b53"
+      "sha256": "30ec9abe3a6d9030f8094f3f76a49d1c62c4480f6a8bfa9f24fd83beb9050a75"
     },
     {
       "file": "moa-preview.apk",
-      "bytes": 8642751,
-      "sha256": "d740d169e0ffdc7538c2f60eb4e4d8095ebe6110dd741981e19aadc672d5c755"
+      "bytes": 7910791,
+      "sha256": "f2cab42063d0fabf2d2e967fa147d364293c02b62d2b731ae06654d22d5fa97d"
     },
     {
       "file": "moa-release-unsigned.aab",
-      "bytes": 9487171,
-      "sha256": "d3b7a452dace4eb93d1b9f8c5733afee68eb0c33b3dde2ed4e65c14828654610"
+      "bytes": 8790955,
+      "sha256": "af263ad610b3d71e480e39136ebfe8f5aadf9a40376f9fb2493189997d25ba42"
     },
     {
       "file": "moa-release-unsigned.apk",
-      "bytes": 8630463,
-      "sha256": "3d981400fe20fbfe89c10abb139515acd8a15bc2da1c79a24cfc1fdec4228fc6"
+      "bytes": 7898503,
+      "sha256": "7bee76cb185cfb458e74e84d0580e864f8ae7b68b48732d7c73be02291cef1b6"
     }
   ],
-  "apiKeyAbsentInAllArchiveEntries": true
+  "archiveIntegrityVerified": true,
+  "revision": "dropdowns and month range"
 }

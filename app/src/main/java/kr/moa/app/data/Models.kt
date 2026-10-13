@@ -33,7 +33,7 @@ fun venueLabel(value: String): String = value.ifBlank { "공연장 정보 없음
 val genres = listOf("콘서트", "뮤지컬", "연극", "클래식", "국악", "무용", "서커스/마술", "복합", "축제")
 val regions = listOf("전국", "서울", "부산", "대구", "인천", "전남광주", "대전", "울산", "세종", "경기", "강원", "충북", "충남", "전북", "경북", "경남", "제주")
 
-data class Filters(val region: String = "전국", val genres: Set<String> = emptySet(), val date: String = "전체 일정", val from: LocalDate? = null, val to: LocalDate? = null, val descending: Boolean = false)
+data class Filters(val region: String = "전국", val genres: Set<String> = emptySet(), val date: String = "이번 달", val from: LocalDate? = null, val to: LocalDate? = null, val descending: Boolean = false, val selectedRegions: Set<String> = emptySet())
 
 fun filterPerformances(items: List<Performance>, query: String, filters: Filters, today: LocalDate = LocalDate.now()): List<Performance> {
     val range = when (filters.date) {
@@ -41,14 +41,23 @@ fun filterPerformances(items: List<Performance>, query: String, filters: Filters
         "이번 주" -> today.with(java.time.DayOfWeek.MONDAY) to today.with(java.time.DayOfWeek.SUNDAY)
         "이번 주말" -> today.with(java.time.DayOfWeek.SATURDAY) to today.with(java.time.DayOfWeek.SUNDAY)
         "이번 달" -> today.withDayOfMonth(1) to today.withDayOfMonth(today.lengthOfMonth())
+        "3개월", "6개월" -> today.withDayOfMonth(1) to today.plusMonths(if (filters.date == "3개월") 2 else 5).let { it.withDayOfMonth(it.lengthOfMonth()) }
         "직접 선택" -> (filters.from ?: today) to (filters.to ?: filters.from ?: today)
         else -> null
     }
     val words = query.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
     return items.filter { p ->
-        (filters.region == "전국" || p.region == filters.region) &&
+        (filters.effectiveRegions.isEmpty() || p.region in filters.effectiveRegions) &&
         (filters.genres.isEmpty() || p.genre in filters.genres || ("축제" in filters.genres && p.festival)) &&
         words.all { word -> (p.title + " " + p.artists.joinToString(" ")).contains(word, ignoreCase = true) } &&
         (range == null || runCatching { LocalDate.parse(p.startDate) <= range.second && LocalDate.parse(p.endDate) >= range.first }.getOrDefault(false))
     }.let { if (filters.descending) it.sortedBy { p -> p.endDate } else it.sortedBy { p -> p.startDate } }
 }
+
+val Filters.effectiveRegions: Set<String> get() = selectedRegions.ifEmpty { if (region == "전국") emptySet() else setOf(region) }
+val Filters.regionLabel: String get() = effectiveRegions.let { if (it.isEmpty()) "전국" else regions.filter { r -> r in it }.joinToString(", ") }
+fun Filters.toggleRegion(value: String): Filters {
+    val next = if (value == "전국") emptySet() else effectiveRegions.let { if (value in it) it - value else it + value }
+    return copy(region = next.singleOrNull() ?: "전국", selectedRegions = next)
+}
+val Filters.periodLabel: String get() = if (date == "직접 선택" && from != null && to != null) "${from.year}년 ${from.monthValue}월 – ${to.year}년 ${to.monthValue}월" else date

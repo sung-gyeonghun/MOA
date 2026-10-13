@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="kr.moa.app.BookingUiTest" tests="13" failures="0" errors="0" skipped="0" time="19.216" timestamp="2026-10-13T02:42:24" hostname="localhost">
+  <properties>
+    <property name="device" value="Moa_Android10(AVD) - 10" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="selectedOfficialBookingLinkIsPassedUnchangedToBrowserHandler" classname="kr.moa.app.BookingUiTest" time="2.639" />
+  <testcase name="unavailableBrowserShowsErrorInsteadOfCrashing" classname="kr.moa.app.BookingUiTest" time="1.157" />
+  <testcase name="monthOnlyRangeAndSettingsHaveNoDataAddress" classname="kr.moa.app.MoaFlowTest" time="2.708" />
+  <testcase name="searchDetailFavoriteAndPersistence" classname="kr.moa.app.MoaFlowTest" time="3.577" />
+  <testcase name="unmatchedSearchShowsEmptyState" classname="kr.moa.app.MoaFlowTest" time="1.594" />
+  <testcase name="regionAndMultipleGenresApplyAndSurviveRecreation" classname="kr.moa.app.MoaFlowTest" time="3.392" />
+  <testcase name="migrationKeepsVersionOneFavorites" classname="kr.moa.app.data.RepositoryTest" time="0.438" />
+  <testcase name="mismatchedFileChecksumKeepsLastGoodSnapshot" classname="kr.moa.app.data.RepositoryTest" time="0.491" />
+  <testcase name="httpsRefreshDeduplicatesAndPersistsOfflineCatalog" classname="kr.moa.app.data.RepositoryTest" time="0.34" />
+  <testcase name="changingPublicationAndInvalidDatesCannotReplaceCache" classname="kr.moa.app.data.RepositoryTest" time="0.597" />
+  <testcase name="preferencesAndFavoritesSurviveStorageReopen" classname="kr.moa.app.data.RepositoryTest" time="0.106" />
+  <testcase name="fiveThousandCachedPerformancesLoadWithinTwoSeconds" classname="kr.moa.app.data.RepositoryTest" time="0.719" />
+  <testcase name="httpErrorMalformedJsonAndEmptySnapshotKeepLastGoodData" classname="kr.moa.app.data.RepositoryTest" time="0.44" />
+</testsuite>

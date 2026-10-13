@@ -16,6 +16,8 @@ class MoaFlowTest {
         }
         compose.onNodeWithText("검색", useUnmergedTree = true).performClick()
         compose.waitUntil(15000) { compose.onAllNodesWithText("어떤 무대를 찾고 있나요?").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithContentDescription("기간 선택").performClick()
+        compose.onNodeWithText("6개월").performClick()
         compose.onNode(hasSetTextAction()).performTextInput("달의 정원")
         compose.onNodeWithText("검색 결과  1").assertExists()
         compose.onNodeWithText("뮤지컬 달의 정원").performClick()
@@ -39,20 +41,36 @@ class MoaFlowTest {
         compose.waitUntil(10000) { compose.onAllNodesWithText("찾는 공연이 없어요").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithText("찾는 공연이 없어요").assertExists()
     }
+
     @Test fun regionAndMultipleGenresApplyAndSurviveRecreation() {
-        compose.onNodeWithText("발견", useUnmergedTree = true).performClick()
-        compose.onNodeWithText("전국", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("필터").performClick()
         compose.onNodeWithText("초기화").performClick()
+        compose.onAllNodesWithContentDescription("지역 선택").onLast().performClick()
         compose.onNodeWithText("대구").performClick()
-        compose.onNodeWithText("대구").assertIsSelected()
-        compose.onAllNodesWithText("콘서트").onLast().performClick()
+        compose.onNodeWithText("서울").performClick()
+        compose.onNodeWithText("선택 완료").performScrollTo().performClick()
+        compose.onAllNodesWithContentDescription("장르 선택").onLast().performClick()
+        compose.onNodeWithText("콘서트").performClick()
         compose.onAllNodesWithText("뮤지컬").onLast().performClick()
-        compose.onNodeWithText("이 조건으로 찾아보기").performScrollTo().performClick()
-        compose.waitUntil(10000) { compose.onAllNodesWithText("대구에서 만나는 1개의 공연").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("선택 완료").performScrollTo().performClick()
+        compose.onNodeWithText("이 조건으로 찾아보기").performClick()
+        compose.waitUntil(10000) { compose.onAllNodesWithText("서울, 대구에서 만나는", substring = true).fetchSemanticsNodes().isNotEmpty() }
         compose.activityRule.scenario.recreate()
-        compose.waitUntil(15000) { compose.onAllNodesWithText("대구에서 만나는 1개의 공연").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithText("대구", useUnmergedTree = true).performClick()
+        compose.waitUntil(15000) { compose.onAllNodesWithText("서울, 대구에서 만나는", substring = true).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("필터").performClick()
         compose.onNodeWithText("초기화").performClick()
-        compose.onNodeWithText("이 조건으로 찾아보기").performScrollTo().performClick()
+        compose.onNodeWithText("이 조건으로 찾아보기").performClick()
+    }
+    @Test fun monthOnlyRangeAndSettingsHaveNoDataAddress() {
+        compose.onNodeWithContentDescription("기간 선택").performClick()
+        compose.onNodeWithText("직접 선택").performClick()
+        compose.onNodeWithText("공연을 만날 기간").assertExists()
+        compose.onNodeWithText("2월").performClick()
+        compose.onNodeWithText("8월").performClick()
+        compose.onNodeWithText("기간 적용").performClick()
+        compose.onNodeWithText("2026년 2월 – 2026년 8월").assertExists()
+        compose.onNodeWithText("설정", useUnmergedTree = true).performClick()
+        compose.onNodeWithText("GitHub Pages 데이터 주소").assertDoesNotExist()
+        compose.onNodeWithText("공연 데이터").assertDoesNotExist()
     }
 }

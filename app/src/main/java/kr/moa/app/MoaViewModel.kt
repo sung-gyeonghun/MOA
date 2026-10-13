@@ -21,7 +21,7 @@ class MoaViewModel @Inject constructor(private val repository: MoaRepository) : 
     val query = MutableStateFlow("")
     val busy = MutableStateFlow(false)
     val message = MutableStateFlow<String?>(null)
-    init { viewModelScope.launch { catalog.value = repository.initial(); val defaults = repository.preferences.first(); filters.value = Filters(defaults.region, defaults.genres); if (defaults.endpoint.isNotBlank()) refresh() } }
+    init { viewModelScope.launch { catalog.value = repository.initial(); val defaults = repository.preferences.first(); filters.value = Filters(defaults.region, defaults.genres, selectedRegions = defaults.selectedRegions); if (defaults.endpoint.isNotBlank()) refresh() } }
     fun refresh() {
         if (busy.value) return
         busy.value = true
@@ -37,7 +37,7 @@ class MoaViewModel @Inject constructor(private val repository: MoaRepository) : 
         }
     }
     fun favorite(p: Performance) { viewModelScope.launch { repository.favorite(p) } }
-    fun defaults(f: Filters) { filters.value = f; viewModelScope.launch { repository.setDefaults(f.region, f.genres) } }
+    fun defaults(f: Filters) { filters.value = f; viewModelScope.launch { repository.setDefaults(f.region, f.genres, f.effectiveRegions) } }
     fun endpoint(url: String) { viewModelScope.launch { repository.setEndpoint(url); message.value = "데이터 주소를 저장했어요." } }
     fun search(word: String) { query.value = word; viewModelScope.launch { repository.history(word) } }
     fun clearHistory(word: String? = null) { viewModelScope.launch { repository.clearHistory(word) } }
