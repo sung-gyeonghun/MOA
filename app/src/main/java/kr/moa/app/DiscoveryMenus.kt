@@ -6,6 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,13 +24,14 @@ import java.time.YearMonth
     Text(value, color = Muted, fontSize = 11.sp, lineHeight = 17.sp, modifier = Modifier.padding(top = 7.dp, start = 4.dp))
 }
 
-@Composable private fun MenuField(label: String, description: String, modifier: Modifier, content: @Composable (close: () -> Unit) -> Unit) {
+@Composable private fun MenuField(label: String, description: String, modifier: Modifier, pill: Boolean = false, content: @Composable (close: () -> Unit) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     Box(modifier) {
-        Surface(onClick = { expanded = true }, modifier = Modifier.fillMaxWidth().semantics { contentDescription = description }, color = Color.White, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, Lavender)) {
-            Row(Modifier.padding(horizontal = 14.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(label, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                Icon(Icons.Rounded.KeyboardArrowDown, null, tint = Purple, modifier = Modifier.size(20.dp))
+        Surface(onClick = { expanded = true }, modifier = (if (pill) Modifier else Modifier.fillMaxWidth()).semantics { contentDescription = description }, color = Color.White, shape = if (pill) RoundedCornerShape(50) else RoundedCornerShape(16.dp), border = BorderStroke(1.dp, Lavender)) {
+            Row(Modifier.heightIn(min = 48.dp).padding(horizontal = if (pill) 12.dp else 14.dp, vertical = if (pill) 10.dp else 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                if (pill) { Icon(Icons.Outlined.LocationOn, null, tint = Purple, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)) }
+                Text(label, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = !pill))
+                Icon(Icons.Rounded.KeyboardArrowDown, null, tint = if (pill) Ink else Purple, modifier = Modifier.size(if (pill) 18.dp else 20.dp))
             }
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }, modifier = Modifier.widthIn(min = 210.dp, max = 300.dp), containerColor = Color.White) {
@@ -43,10 +45,10 @@ import java.time.YearMonth
         modifier = Modifier.semantics { selected = checked; stateDescription = if (checked) "선택됨" else "선택 안 됨" })
 }
 
-@Composable fun RegionMenu(filters: Filters, change: (Filters) -> Unit, modifier: Modifier = Modifier) {
+@Composable fun RegionMenu(filters: Filters, change: (Filters) -> Unit, modifier: Modifier = Modifier, pill: Boolean = false) {
     val selection = filters.effectiveRegions
     val label = if (selection.size > 1) "${regions.first { it in selection }} 외 ${selection.size - 1}곳" else filters.regionLabel
-    MenuField(label, "지역 선택", modifier) { close ->
+    MenuField(label, "지역 선택", modifier, pill) { close ->
         regions.forEach { value -> Choice(value, if (value == "전국") selection.isEmpty() else value in selection) { change(filters.toggleRegion(value)) } }
         DropdownMenuItem(text = { Text("선택 완료", color = Purple, fontWeight = FontWeight.Bold) }, onClick = close)
     }

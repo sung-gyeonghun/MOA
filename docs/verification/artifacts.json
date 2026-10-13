@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-10-13T11:44:17+09:00",
+  "verifiedAt": "2026-10-13T11:51:53+09:00",
   "artifacts": [
     {
       "file": "moa-debug.apk",
@@ -9,7 +9,7 @@
     {
       "file": "moa-preview.apk",
       "bytes": 7910791,
-      "sha256": "f2cab42063d0fabf2d2e967fa147d364293c02b62d2b731ae06654d22d5fa97d"
+      "sha256": "3228f5818993dbd6d3e75061e03ba70969b444a8e9c71219ed8406db895795ec"
     },
     {
       "file": "moa-release-unsigned.aab",
@@ -23,5 +23,5 @@
     }
   ],
   "archiveIntegrityVerified": true,
-  "revision": "dropdowns and month range"
+  "revision": "Preview regional pill styling restored; other artifacts from dropdown/month build"
 }
