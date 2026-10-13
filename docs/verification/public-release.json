@@ -1,12 +1,12 @@
 {
-  "releaseUrl": "https://github.com/sung-gyeonghun/MOA/releases/tag/v1.0.0-preview.1",
-  "tag": "v1.0.0-preview.1",
+  "releaseUrl": "https://github.com/sung-gyeonghun/MOA/releases/tag/v1.0.1-preview.1",
+  "tag": "v1.0.1-preview.1",
+  "version": "1.0.1",
   "prerelease": true,
-  "assetUrl": "https://github.com/sung-gyeonghun/MOA/releases/download/v1.0.0-preview.1/moa-preview.apk",
-  "bytes": 7910791,
-  "sha256": "3228f5818993dbd6d3e75061e03ba70969b444a8e9c71219ed8406db895795ec",
-  "githubDigest": "sha256:3228f5818993dbd6d3e75061e03ba70969b444a8e9c71219ed8406db895795ec",
-  "sourceCommit": "04e09c037325d387752d8539aa3066d0de79ea42",
+  "assetUrl": "https://github.com/sung-gyeonghun/MOA/releases/download/v1.0.1-preview.1/moa-preview.apk",
+  "bytes": 7910795,
+  "sha256": "22dead5f0be29082e8f5486f5e8b16f4d00cdb77840f6df0a4cffebcd445f0c5",
+  "githubDigest": "sha256:22dead5f0be29082e8f5486f5e8b16f4d00cdb77840f6df0a4cffebcd445f0c5",
   "anonymousDownloadVerified": true,
-  "downloadedSha256": "3228f5818993dbd6d3e75061e03ba70969b444a8e9c71219ed8406db895795ec"
+  "sourceCommit": "8f68ea6ed907a4c36e693c6513dea3b24a614bc8"
 }
