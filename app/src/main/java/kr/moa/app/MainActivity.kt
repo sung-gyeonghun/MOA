@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -45,17 +46,12 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import dagger.hilt.android.AndroidEntryPoint
 
-val Purple = Color(0xFF7353E6)
-val Ink = Color(0xFF29233B)
-val Muted = Color(0xFF827B91)
-val Lavender = Color(0xFFF0EAFF)
-val Canvas = Color(0xFFFCFAFF)
-val Pink = Color(0xFFFFD8E5)
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) { super.onCreate(savedInstanceState); enableEdgeToEdge(); setContent {
-        MaterialTheme(typography = moaTypography(), colorScheme = lightColorScheme(primary = Purple, onPrimary = Color.White, background = Canvas, surface = Canvas, onSurface = Ink, secondaryContainer = Lavender, outline = Color(0xFFE8E2F0))) { MoaApp() }
+        val vm: MoaViewModel = viewModel()
+        val prefs by vm.preferences.collectAsStateWithLifecycle()
+        MoaTheme(prefs.darkMode) { MoaApp(vm) }
     } }
 }
 
@@ -74,21 +70,22 @@ class MainActivity : ComponentActivity() {
     var filterOpen by remember { mutableStateOf(false) }
     val snack = remember { SnackbarHostState() }
     LaunchedEffect(message) { message?.let { snack.showSnackbar(it); vm.message.value = null } }
+    val keyboardVisible = WindowInsets.ime.getBottom(androidx.compose.ui.platform.LocalDensity.current) > 0
     val open: (Performance) -> Unit = { nav.navigate("detail/${it.id}") }
-    Scaffold(modifier = Modifier.imePadding(), containerColor = Canvas, snackbarHost = { SnackbarHost(snack) }, bottomBar = {
-        if (!route.startsWith("detail")) Surface(color = Color.White, shadowElevation = 8.dp) {
-            NavigationBar(containerColor = Color.White, tonalElevation = 0.dp) {
+    Scaffold( containerColor = Canvas, snackbarHost = { SnackbarHost(snack) }, bottomBar = {
+        if (!route.startsWith("detail") && !keyboardVisible) Surface(color = MoaSurface, shadowElevation = 8.dp) {
+            NavigationBar(containerColor = MoaSurface, tonalElevation = 0.dp) {
                 listOf(Triple("home", "홈", Icons.Outlined.Home), Triple("search", "검색", Icons.Outlined.Search), Triple("favorites", "찜", Icons.Outlined.FavoriteBorder), Triple("settings", "설정", Icons.Outlined.Tune)).forEach { (r, label, icon) ->
                     NavigationBarItem(selected = route == r, onClick = { nav.navigate(r) { popUpTo("home") { saveState = true }; launchSingleTop = true; restoreState = true } }, icon = { Icon(icon, label) }, label = { Text(label, fontSize = 11.sp, fontWeight = FontWeight.SemiBold) }, colors = NavigationBarItemDefaults.colors(selectedIconColor = Purple, selectedTextColor = Purple, indicatorColor = Lavender, unselectedIconColor = Muted, unselectedTextColor = Muted))
                 }
             }
         }
     }) { padding ->
-        NavHost(navController = nav, startDestination = "home", modifier = Modifier.padding(padding)) {
-            composable("home") { HomeScreen(catalog, filters, favorites, busy, { filterOpen = true }, { nav.navigate("search") }, { vm.defaults(it) }, vm::favorite, open, vm::refresh) }
+        NavHost(navController = nav, startDestination = "home", modifier = Modifier.padding(padding).consumeWindowInsets(padding).imePadding()) {
+            composable("home") { HomeScreen(catalog, filters, favorites, busy, { filterOpen = true }, { vm.defaults(it) }, vm::favorite, open, vm::refresh) }
             composable("search") { SearchScreen(catalog, filters, query, prefs.history, favorites, { vm.query.value = it }, vm::search, vm::clearHistory, { filterOpen = true }, { vm.defaults(it) }, vm::favorite, open) }
             composable("favorites") { FavoritesScreen(favorites, vm::favorite, open) }
-            composable("settings") { SettingsScreen(filters, { filterOpen = true }) }
+            composable("settings") { SettingsScreen(filters, prefs.darkMode, vm::darkMode, { filterOpen = true }) }
             composable("detail/{id}") { back -> val id = back.arguments?.getString("id"); val p = catalog?.performances?.find { it.id == id } ?: favorites.find { it.id == id }; if (p != null) DetailScreen(p, favorites.any { it.id == p.id }, catalog?.sample == true || p.id.startsWith("DEMO"), { nav.popBackStack() }, { vm.favorite(p) }) else EmptyState("공연 정보를 찾지 못했어요", "목록으로 돌아가 다시 선택해주세요.") }
         }
     }
@@ -98,27 +95,26 @@ class MainActivity : ComponentActivity() {
 @Composable fun BrandHeader(region: String, onRegion: () -> Unit) {
     Row(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
         Image(painterResource(R.drawable.app_logo), "모아", Modifier.width(82.dp).height(42.dp), contentScale = ContentScale.Fit)
-        Surface(onClick = onRegion, shape = RoundedCornerShape(50), color = Color.White, border = BorderStroke(1.dp, Lavender)) { Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Outlined.LocationOn, null, tint = Purple, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)); Text(region, fontSize = 13.sp, fontWeight = FontWeight.SemiBold); Icon(Icons.Rounded.KeyboardArrowDown, null, modifier = Modifier.size(18.dp)) } }
+        Surface(onClick = onRegion, shape = RoundedCornerShape(50), color = MoaSurface, border = BorderStroke(1.dp, Lavender)) { Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Outlined.LocationOn, null, tint = Purple, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)); Text(region, fontSize = 13.sp, fontWeight = FontWeight.SemiBold); Icon(Icons.Rounded.KeyboardArrowDown, null, modifier = Modifier.size(18.dp)) } }
     }
 }
 @Composable fun SectionTitle(title: String, subtitle: String = "", action: String = "", onAction: () -> Unit = {}) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) { Column(Modifier.weight(1f)) { Text(title, fontSize = 21.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.6).sp); if (subtitle.isNotEmpty()) Text(subtitle, color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 5.dp)) }; if (action.isNotEmpty()) TextButton(onClick = onAction) { Text(action, fontSize = 12.sp) } }
 }
 @Composable fun Pill(label: String, selected: Boolean = false, onClick: () -> Unit) {
-    Surface(onClick = onClick, modifier = Modifier.semantics { this.selected = selected; stateDescription = if (selected) "선택됨" else "선택 안 됨" }, color = if (selected) Purple else Color.White, contentColor = if (selected) Color.White else Muted, shape = RoundedCornerShape(50), border = if (selected) null else BorderStroke(1.dp, Color(0xFFECE6F5))) { Text(label, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp), fontSize = 13.sp, fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium, maxLines = 1) }
+    Surface(onClick = onClick, modifier = Modifier.semantics { this.selected = selected; stateDescription = if (selected) "선택됨" else "선택 안 됨" }, color = if (selected) Purple else MoaSurface, contentColor = if (selected) Color.White else Muted, shape = RoundedCornerShape(50), border = if (selected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outline)) { Text(label, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp), fontSize = 13.sp, fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium, maxLines = 1) }
 }
 @Composable fun SampleNotice(sample: Boolean) { if (sample) Text("DESIGN PREVIEW  ·  실제 예매 정보가 아닌 체험 데이터", color = Muted, fontSize = 10.sp, letterSpacing = 0.3.sp, modifier = Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 8.dp)) }
 
-@Composable fun HomeScreen(catalog: Catalog?, filters: Filters, favorites: List<Performance>, busy: Boolean, onFilter: () -> Unit, onSearch: () -> Unit, change: (Filters) -> Unit, favorite: (Performance) -> Unit, open: (Performance) -> Unit, refresh: () -> Unit) {
+@Composable fun HomeScreen(catalog: Catalog?, filters: Filters, favorites: List<Performance>, busy: Boolean, onFilter: () -> Unit, change: (Filters) -> Unit, favorite: (Performance) -> Unit, open: (Performance) -> Unit, refresh: () -> Unit) {
     val all = catalog?.performances.orEmpty()
     val list = remember(all, filters) { filterPerformances(all, "", filters) }
     val upcoming = list.filter { it.startDate >= LocalDate.now().toString() }.ifEmpty { list }
     LazyColumn(verticalArrangement = Arrangement.spacedBy(14.dp), contentPadding = PaddingValues(bottom = 24.dp)) {
-        item { Column(Modifier.fillMaxWidth().background(Brush.linearGradient(listOf(Canvas, Color(0xFFF3EAFE), Color(0xFFFFF2F6)))).padding(horizontal = 24.dp, vertical = 14.dp)) {
+        item { Column(Modifier.fillMaxWidth().background(Brush.linearGradient(listOf(Canvas, Lavender, Pink.copy(alpha = .35f)))).padding(horizontal = 24.dp, vertical = 14.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text("YOUR NEXT STAGE AWAITS", modifier = Modifier.weight(1f), color = Purple, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp); RegionMenu(filters, change, Modifier.widthIn(max = 145.dp), pill = true) }
             Spacer(Modifier.height(12.dp)); Text("당신의 다음 설렘을\n여기, 모아 ✦", color = Ink, fontSize = 32.sp, lineHeight = 43.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-1.4).sp)
             Text("보고 싶은 공연, 한곳에서 만나보세요.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp, bottom = 20.dp))
-            Surface(onClick = onSearch, color = Color.White, shape = RoundedCornerShape(18.dp), shadowElevation = 2.dp) { Row(Modifier.fillMaxWidth().padding(17.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Outlined.Search, null, tint = Purple); Spacer(Modifier.width(10.dp)); Text("공연명, 아티스트를 검색해보세요", fontSize = 13.sp, color = Muted, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Rounded.ArrowForward, null, modifier = Modifier.size(18.dp), tint = Purple) } }
             Spacer(Modifier.height(8.dp))
         } }
         item { DiscoveryMenus(filters, change) }
@@ -142,7 +138,7 @@ class MainActivity : ComponentActivity() {
         Text(dateLabel(p), fontSize = 11.sp, color = Muted, modifier = Modifier.padding(top = 6.dp)); Text("${venueLabel(p.venue)} · ${p.region.ifBlank { "지역 정보 없음" }}", fontSize = 11.sp, color = Muted, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
     }
 }
-@Composable fun Heart(saved: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) { Surface(shape = RoundedCornerShape(50), color = Color.White.copy(alpha = .94f), modifier = modifier) { IconButton(onClick = onClick, modifier = Modifier.size(48.dp)) { Icon(if (saved) Icons.Rounded.Favorite else Icons.Outlined.FavoriteBorder, if (saved) "찜 해제" else "찜하기", tint = if (saved) Color(0xFFD76B95) else Muted, modifier = Modifier.size(23.dp)) } } }
+@Composable fun Heart(saved: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) { Surface(shape = RoundedCornerShape(50), color = MoaSurface.copy(alpha = .94f), modifier = modifier) { IconButton(onClick = onClick, modifier = Modifier.size(48.dp)) { Icon(if (saved) Icons.Rounded.Favorite else Icons.Outlined.FavoriteBorder, if (saved) "찜 해제" else "찜하기", tint = if (saved) Color(0xFFD76B95) else Muted, modifier = Modifier.size(23.dp)) } } }
 
 @Composable fun PosterArt(p: Performance, modifier: Modifier = Modifier) {
     val palette = when (p.artwork) {
@@ -174,7 +170,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable fun PerformanceRow(p: Performance, saved: Boolean, favorite: () -> Unit, open: () -> Unit, modifier: Modifier = Modifier) {
-    Surface(onClick = open, shape = RoundedCornerShape(20.dp), color = Color.White, border = BorderStroke(1.dp, Color(0xFFEEE8F5)), modifier = modifier.fillMaxWidth()) {
+    Surface(onClick = open, shape = RoundedCornerShape(20.dp), color = MoaSurface, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline), modifier = modifier.fillMaxWidth()) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             PosterArt(p, Modifier.width(82.dp).height(118.dp).clip(RoundedCornerShape(12.dp)))
             Column(Modifier.weight(1f).padding(start = 12.dp)) {
@@ -220,19 +216,19 @@ class MainActivity : ComponentActivity() {
         LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
             item { Box(Modifier.fillMaxWidth().background(Brush.verticalGradient(listOf(Lavender, Canvas))).padding(horizontal = 76.dp, vertical = 22.dp)) { PosterArt(p, Modifier.fillMaxWidth().aspectRatio(.72f).clip(RoundedCornerShape(22.dp))) } }
             item { Column(Modifier.padding(horizontal = 24.dp)) { Text("${p.genre}  /  ${p.region}  /  ${p.status}", color = Purple, fontSize = 12.sp, fontWeight = FontWeight.Bold); Text(p.title, fontSize = 27.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 36.sp, letterSpacing = (-.8).sp, modifier = Modifier.padding(top = 10.dp)); if (sample) Text("디자인 체험용 가상 공연입니다.", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 12.dp)) } }
-            item { Surface(color = Color.White, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, Lavender), modifier = Modifier.padding(horizontal = 22.dp)) { Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(17.dp)) { InfoRow(Icons.Outlined.CalendarMonth, "공연 기간", dateLabel(p)); InfoRow(Icons.Outlined.LocationOn, "공연장", venueLabel(p.venue)); InfoRow(Icons.Outlined.Schedule, "관람 시간", p.runtime); InfoRow(Icons.Outlined.PersonOutline, "관람 연령", p.age); InfoRow(Icons.Outlined.ConfirmationNumber, "티켓 가격", p.ticketPrice) } } }
+            item { Surface(color = MoaSurface, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, Lavender), modifier = Modifier.padding(horizontal = 22.dp)) { Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(17.dp)) { InfoRow(Icons.Outlined.CalendarMonth, "공연 기간", dateLabel(p)); InfoRow(Icons.Outlined.LocationOn, "공연장", venueLabel(p.venue)); InfoRow(Icons.Outlined.Schedule, "관람 시간", p.runtime); InfoRow(Icons.Outlined.PersonOutline, "관람 연령", p.age); InfoRow(Icons.Outlined.ConfirmationNumber, "티켓 가격", p.ticketPrice) } } }
             item { Column(Modifier.padding(horizontal = 24.dp)) { SectionTitle("함께하는 아티스트"); Spacer(Modifier.height(12.dp)); Text(p.artists.joinToString(" · ").ifBlank { "출연진 정보가 제공되지 않았어요." }, color = Muted, fontSize = 14.sp, lineHeight = 24.sp) } }
             item { Column(Modifier.padding(horizontal = 24.dp)) { SectionTitle("공연 안내"); Spacer(Modifier.height(12.dp)); Text(p.description.ifBlank { "상세 소개는 예매처에서 확인해주세요." }, color = Muted, fontSize = 14.sp, lineHeight = 25.sp); if (p.schedule.isNotBlank()) Text("\n공연 일정\n${p.schedule}", color = Ink, fontSize = 13.sp, lineHeight = 23.sp) } }
             item { Text(if (sample) "MOA DESIGN PREVIEW" else "출처: (재)예술경영지원센터 공연예술통합전산망(www.kopis.or.kr)\n정보는 변경될 수 있으니 예매처에서 최종 확인해주세요.", color = Muted, fontSize = 11.sp, lineHeight = 18.sp, modifier = Modifier.padding(horizontal = 24.dp)) }
         }
-        Surface(color = Color.White, shadowElevation = 8.dp) { Column(Modifier.padding(horizontal = 22.dp, vertical = 14.dp)) { Button(onClick = { booking = true }, enabled = p.bookingUrls.isNotEmpty() && !sample, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().height(54.dp)) { Icon(Icons.Outlined.ConfirmationNumber, null); Spacer(Modifier.width(10.dp)); Text("공식 예매처로 이동", fontWeight = FontWeight.Bold) }; if (p.bookingUrls.isEmpty() || sample) Text(if (sample) "체험 데이터에서는 예매를 제공하지 않아요." else "제공된 공식 예매 링크가 없어요.", color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 6.dp)) } }
+        Surface(color = MoaSurface, shadowElevation = 8.dp) { Column(Modifier.padding(horizontal = 22.dp, vertical = 14.dp)) { Button(onClick = { booking = true }, enabled = p.bookingUrls.isNotEmpty() && !sample, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().height(54.dp)) { Icon(Icons.Outlined.ConfirmationNumber, null); Spacer(Modifier.width(10.dp)); Text("공식 예매처로 이동", fontWeight = FontWeight.Bold) }; if (p.bookingUrls.isEmpty() || sample) Text(if (sample) "체험 데이터에서는 예매를 제공하지 않아요." else "제공된 공식 예매 링크가 없어요.", color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 6.dp)) } }
     }
     if (booking) AlertDialog(onDismissRequest = { booking = false }, title = { Text("예매처 선택") }, text = { Column { p.bookingUrls.forEach { link -> TextButton(onClick = { booking = false; if (link.url.startsWith("https://") || link.url.startsWith("http://")) runCatching { uri.openUri(link.url) }.onFailure { linkError = true } else linkError = true }) { Text(link.name.ifBlank { "공식 예매처" }) } } } }, confirmButton = { TextButton(onClick = { booking = false }) { Text("닫기") } })
     if (linkError) AlertDialog(onDismissRequest = { linkError = false }, title = { Text("링크를 열 수 없어요") }, text = { Text("예매처 주소나 브라우저 설정을 확인해주세요.") }, confirmButton = { TextButton(onClick = { linkError = false }) { Text("확인") } })
 }
 @Composable fun InfoRow(icon: ImageVector, label: String, value: String) { Row(verticalAlignment = Alignment.Top) { Icon(icon, null, tint = Purple, modifier = Modifier.size(19.dp)); Text(label, color = Muted, fontSize = 12.sp, modifier = Modifier.width(88.dp).padding(start = 10.dp)); Text(value.ifBlank { "정보 없음" }, fontSize = 13.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f)) } }
 
-@Composable fun SettingsScreen(filters: Filters, onFilter: () -> Unit) {
+@Composable fun SettingsScreen(filters: Filters, darkMode: Boolean, changeDarkMode: (Boolean) -> Unit, onFilter: () -> Unit) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         Text("나의 모아", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.padding(top = 18.dp))
         Text("취향에 맞게, 더 편안하게.", color = Muted, fontSize = 13.sp)
@@ -240,20 +236,26 @@ class MainActivity : ComponentActivity() {
             Image(painterResource(R.drawable.app_icon), null, Modifier.size(62.dp).clip(RoundedCornerShape(16.dp)))
             Column(Modifier.padding(start = 16.dp)) { Text("보고 싶은 공연,", fontWeight = FontWeight.Bold); Text("여기 다 모아.", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Purple) }
         } }
+        Surface(color = MoaSurface, shape = RoundedCornerShape(18.dp), border = BorderStroke(1.dp, Lavender)) {
+            Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) { Text("다크모드", fontWeight = FontWeight.Bold); Text("눈이 편안한 어두운 화면", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 5.dp)) }
+                Switch(checked = darkMode, onCheckedChange = changeDarkMode, modifier = Modifier.semantics { contentDescription = "다크모드" })
+            }
+        }
         SectionTitle("내 탐색 설정")
-        Surface(onClick = onFilter, shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, Lavender)) { Column(Modifier.fillMaxWidth().padding(18.dp)) {
+        Surface(onClick = onFilter, shape = RoundedCornerShape(18.dp), color = MoaSurface, border = BorderStroke(1.dp, Lavender)) { Column(Modifier.fillMaxWidth().padding(18.dp)) {
             Text("기본 지역 · 관심 장르", fontWeight = FontWeight.Bold)
             Text("${filters.regionLabel} · ${filters.genres.joinToString(", ").ifBlank { "전체 장르" }}", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp))
         } }
         HorizontalDivider(color = Lavender)
-        Text("모아 v1.0.0\n공연 정보 출처: (재)예술경영지원센터 KOPIS\n찜과 선호 설정은 이 기기에 저장됩니다.", color = Muted, fontSize = 12.sp, lineHeight = 22.sp)
+        Text("모아 v${BuildConfig.VERSION_NAME}\n공연 정보 출처: (재)예술경영지원센터 KOPIS\n찜과 선호 설정은 이 기기에 저장됩니다.", color = Muted, fontSize = 12.sp, lineHeight = 22.sp)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable fun FilterSheet(current: Filters, dismiss: () -> Unit, apply: (Filters) -> Unit) {
     var draft by remember { mutableStateOf(current) }
-    ModalBottomSheet(onDismissRequest = dismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Color.White) {
+    ModalBottomSheet(onDismissRequest = dismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = MoaSurface) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
             SectionTitle("나에게 맞는 무대", action = "초기화", onAction = { draft = Filters() })
             Column { Text("지역", fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); RegionMenu(draft, { draft = it }, Modifier.fillMaxWidth()); SelectionNote(draft.regionLabel) }

@@ -36,6 +36,7 @@ class MoaViewModel @Inject constructor(private val repository: MoaRepository) : 
             } finally { busy.value = false }
         }
     }
+    fun darkMode(enabled: Boolean) { viewModelScope.launch { repository.setDarkMode(enabled) } }
     fun favorite(p: Performance) { viewModelScope.launch { repository.favorite(p) } }
     fun defaults(f: Filters) { filters.value = f; viewModelScope.launch { repository.setDefaults(f.region, f.genres, f.effectiveRegions) } }
     fun endpoint(url: String) { viewModelScope.launch { repository.setEndpoint(url); message.value = "데이터 주소를 저장했어요." } }

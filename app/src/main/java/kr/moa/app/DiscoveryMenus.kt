@@ -27,14 +27,14 @@ import java.time.YearMonth
 @Composable private fun MenuField(label: String, description: String, modifier: Modifier, pill: Boolean = false, content: @Composable (close: () -> Unit) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     Box(modifier) {
-        Surface(onClick = { expanded = true }, modifier = (if (pill) Modifier else Modifier.fillMaxWidth()).semantics { contentDescription = description }, color = Color.White, shape = if (pill) RoundedCornerShape(50) else RoundedCornerShape(16.dp), border = BorderStroke(1.dp, Lavender)) {
+        Surface(onClick = { expanded = true }, modifier = (if (pill) Modifier else Modifier.fillMaxWidth()).semantics { contentDescription = description }, color = MoaSurface, shape = if (pill) RoundedCornerShape(50) else RoundedCornerShape(16.dp), border = BorderStroke(1.dp, Lavender)) {
             Row(Modifier.heightIn(min = 48.dp).padding(horizontal = if (pill) 12.dp else 14.dp, vertical = if (pill) 10.dp else 14.dp), verticalAlignment = Alignment.CenterVertically) {
                 if (pill) { Icon(Icons.Outlined.LocationOn, null, tint = Purple, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)) }
                 Text(label, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = !pill))
                 Icon(Icons.Rounded.KeyboardArrowDown, null, tint = if (pill) Ink else Purple, modifier = Modifier.size(if (pill) 18.dp else 20.dp))
             }
         }
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }, modifier = Modifier.widthIn(min = 210.dp, max = 300.dp), containerColor = Color.White) {
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }, modifier = Modifier.widthIn(min = 210.dp, max = 300.dp), containerColor = MoaSurface) {
             content { expanded = false }
         }
     }
@@ -95,7 +95,7 @@ import java.time.YearMonth
     var end by remember { mutableStateOf(filters.to?.let { YearMonth.from(it) } ?: now) }
     var editingEnd by remember { mutableStateOf(false) }
     var year by remember { mutableIntStateOf(start.year) }
-    AlertDialog(onDismissRequest = dismiss, containerColor = Color.White,
+    AlertDialog(onDismissRequest = dismiss, containerColor = MoaSurface,
         title = { Text("공연을 만날 기간", fontSize = 21.sp, fontWeight = FontWeight.Bold) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -116,7 +116,7 @@ import java.time.YearMonth
                                 if (editingEnd) { end = value; if (end < start) start = end }
                                 else { start = value; if (end < start) end = start; editingEnd = true; year = end.year }
                             }, modifier = Modifier.weight(1f).semantics { selected = chosen }, shape = RoundedCornerShape(12.dp),
-                                color = if (chosen) Purple else Color.White, contentColor = if (chosen) Color.White else Ink, border = BorderStroke(1.dp, if (chosen) Purple else Lavender)) {
+                                color = if (chosen) Purple else MoaSurface, contentColor = if (chosen) MaterialTheme.colorScheme.onPrimary else Ink, border = BorderStroke(1.dp, if (chosen) Purple else Lavender)) {
                                 Box(Modifier.heightIn(min = 48.dp).padding(vertical = 12.dp), contentAlignment = Alignment.Center) { Text("${month}월", fontSize = 14.sp) }
                             }
                         }
@@ -128,7 +128,7 @@ import java.time.YearMonth
 }
 
 @Composable private fun MonthEndpoint(label: String, value: YearMonth, active: Boolean, click: () -> Unit) {
-    Surface(onClick = click, color = if (active) Lavender else Color.White, border = BorderStroke(1.dp, if (active) Purple else Lavender), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+    Surface(onClick = click, color = if (active) Lavender else MoaSurface, border = BorderStroke(1.dp, if (active) Purple else Lavender), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
             Text(label, fontSize = 11.sp, color = Muted)
             Text("${value.year}년 ${value.monthValue}월", fontSize = 17.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 4.dp))

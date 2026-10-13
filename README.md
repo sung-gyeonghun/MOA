@@ -15,7 +15,7 @@
 ![Data](https://img.shields.io/badge/Data-KOPIS-F4A6C1?style=flat-square)
 [![Data workflow](https://github.com/sung-gyeonghun/MOA/actions/workflows/data.yml/badge.svg)](https://github.com/sung-gyeonghun/MOA/actions/workflows/data.yml)
 
-[**📥 Android APK 다운로드**](https://github.com/sung-gyeonghun/MOA/releases/download/v1.0.0-preview.1/moa-preview.apk) · [공연 데이터](https://sung-gyeonghun.github.io/MOA/) · [데이터 갱신 이력](https://github.com/sung-gyeonghun/MOA/actions/workflows/data.yml) · [요구사항](docs/performance_app_PRD_v1.0.md) · [검증 기록](docs/verification)
+[**📥 Android APK 다운로드**](https://github.com/sung-gyeonghun/MOA/releases/download/v1.0.1-preview.1/moa-preview.apk) · [공연 데이터](https://sung-gyeonghun.github.io/MOA/) · [데이터 갱신 이력](https://github.com/sung-gyeonghun/MOA/actions/workflows/data.yml) · [요구사항](docs/performance_app_PRD_v1.0.md) · [검증 기록](docs/verification)
 
 <img src="image/app_description.png" alt="모아 브랜드 콘셉트 — 전국의 공연을 한곳에" width="100%" />
 
@@ -38,7 +38,7 @@
     <th align="center">Period · 보고 싶은 달 선택</th>
   </tr>
   <tr>
-    <td width="33%" align="center"><img src="docs/screenshots/home-region-pill.png" alt="실제 공연 데이터가 표시된 최신 메인 화면" width="250" /></td>
+    <td width="33%" align="center"><img src="docs/screenshots/home-v101.png" alt="실제 공연 데이터가 표시된 최신 메인 화면" width="250" /></td>
     <td width="33%" align="center"><img src="docs/screenshots/filter-v2.png" alt="지역·장르·기간 드롭다운과 선택 요약이 있는 필터" width="250" /></td>
     <td width="33%" align="center"><img src="docs/screenshots/month-picker-v2.png" alt="흰색 배경의 시작 월·종료 월 선택창" width="250" /></td>
   </tr>
@@ -48,6 +48,18 @@
     <td align="center">연·월만 선택<br />월의 첫날부터 마지막 날까지</td>
   </tr>
 </table>
+
+<details>
+<summary><strong>다크모드 화면 보기 · v1.0.1</strong></summary>
+
+<table><tr><th>다크모드 홈</th><th>설정 토글</th></tr><tr>
+<td align="center"><img src="docs/screenshots/home-dark-v101.png" alt="다크모드 공연 탐색" width="250" /></td>
+<td align="center"><img src="docs/screenshots/settings-dark-v101.png" alt="다크모드 설정 토글" width="250" /></td>
+</tr></table>
+
+홈 검색창은 제거했습니다. 검색은 하단 검색 탭에서 이용하며, 키보드가 열리면 하단 메뉴를 숨기고 닫히면 다시 표시합니다.
+
+</details>
 
 ### 원하는 무대를 찾는 방법
 
@@ -60,6 +72,7 @@
 | 🎟️ 상세 | 기간·공연장·가격·관람 시간·연령·출연진·안내를 확인하고 공식 예매처를 외부 브라우저로 엽니다. |
 | 💜 찜 | 마음에 드는 공연을 저장합니다. 앱을 종료해도 기기에 남습니다. |
 | ↕️ 정렬 | 시작일순 또는 종료일순으로 공연 목록을 확인합니다. |
+| 🌙 다크모드 | 설정 토글로 밝은 화면·어두운 화면을 전환하고 선택 상태를 기기에 저장합니다. |
 | ☁️ 오프라인 | 인터넷이 없어도 초기 데이터 또는 마지막으로 저장한 정상 목록을 조회합니다. |
 
 > **기간 선택 예시**<br />
@@ -86,7 +99,7 @@
 
 **실제 데이터로 사용하려면 `moa-preview.apk`를 설치하세요.** Android 10 이상을 지원합니다.
 
-1. 휴대폰에서 [**모아 Preview APK 다운로드**](https://github.com/sung-gyeonghun/MOA/releases/download/v1.0.0-preview.1/moa-preview.apk)를 누릅니다. PC로 받았다면 파일을 휴대폰으로 옮깁니다.
+1. 휴대폰에서 [**모아 Preview APK 다운로드**](https://github.com/sung-gyeonghun/MOA/releases/download/v1.0.1-preview.1/moa-preview.apk)를 누릅니다. PC로 받았다면 파일을 휴대폰으로 옮깁니다.
 2. 파일 앱에서 APK를 열고, 필요한 경우 해당 출처의 앱 설치를 허용합니다.
 3. 기존 모아가 설치되어 있다면 같은 개발용 서명의 APK로 업데이트 설치합니다.
 4. 앱을 열면 저장된 목록을 먼저 표시하고 인터넷 연결 시 최신 데이터를 받아옵니다.
@@ -100,7 +113,7 @@
 | `dist/moa-release-unsigned.apk` | 정식 서명 전의 Release APK |
 | `dist/moa-release-unsigned.aab` | Play 제출 준비용 미서명 App Bundle |
 
-`dist/`는 Git에서 제외되어 있지만 설치용 Preview APK는 [GitHub Release](https://github.com/sung-gyeonghun/MOA/releases/tag/v1.0.0-preview.1)에 별도로 배포합니다. 저장소를 복제하면 APK가 함께 내려오지는 않습니다. 직접 빌드하려면 아래 방법을 사용하세요. 현재 Play Store에 출시된 앱은 아닙니다. 파일 크기와 SHA256은 [산출물 기록](docs/verification/artifacts.json)에서 확인할 수 있습니다. 최신 지역 버튼 디자인은 Preview APK에 반영되어 있습니다.
+`dist/`는 Git에서 제외되어 있지만 설치용 Preview APK는 [GitHub Release](https://github.com/sung-gyeonghun/MOA/releases/tag/v1.0.1-preview.1)에 별도로 배포합니다. 저장소를 복제하면 APK가 함께 내려오지는 않습니다. 직접 빌드하려면 아래 방법을 사용하세요. 현재 Play Store에 출시된 앱은 아닙니다. 파일 크기와 SHA256은 [산출물 기록](docs/verification/artifacts.json)에서 확인할 수 있습니다. 현재 배포 버전은 **1.0.1 Preview**입니다. 홈 검색창 제거, 키보드 하단 메뉴 처리와 다크모드를 포함합니다.
 
 ## 🧩 앱을 구성하는 기술
 
@@ -200,13 +213,13 @@ Windows 한글 경로에서 발생한 Gradle 테스트 클래스 로딩 문제�
 | 검증 | 결과 · 근거 |
 | :--- | :--- |
 | 기간·검색·복수 지역 필터 | Kotlin 테스트 **8개 통과** · [결과](docs/verification/month-filter-tests.xml) |
-| UI·저장·네트워크·마이그레이션 | Android 10 연결 테스트 **13개 통과** · [결과](docs/verification/dropdown-month-tests.xml) |
+| UI·저장·네트워크·마이그레이션 | Android 10 연결 테스트 **15개 통과** · [결과](docs/verification/appearance-keyboard-tests.xml) |
 | 데이터 수집·증분·실패 보존 | Python 테스트 **16개 통과** · [결과](docs/verification/python-tests.txt) |
 | 실제 데이터 실행 | Preview 설치, 실제 공연 상세·찜·재실행·오프라인 조회 확인 |
 | 성능 | 합성 5,000건 캐시 로드 2초 이내 확인 · [기록](docs/verification/performance.txt) |
 | 정적 검사 | 검증 빌드 오류 0개. 의존성·SDK 등 관련 경고는 남아 있습니다. |
 
-기능 변경 시점별 검증 근거입니다. 최신 지역 버튼 복원은 Preview 빌드·설치·화면 확인으로 검증했습니다. 전체 기록은 [요구사항 대조표](docs/requirements_audit.md), [구현 현황](docs/implementation_status.md), [검증 폴더](docs/verification)에 있습니다.
+기능 변경 시점별 검증 근거입니다. v1.0.1의 홈 검색창 제거·키보드 하단 메뉴 처리·다크모드 저장과 복원은 연결 테스트 및 실제 데이터 화면으로 검증했습니다. 전체 기록은 [요구사항 대조표](docs/requirements_audit.md), [구현 현황](docs/implementation_status.md), [검증 폴더](docs/verification)에 있습니다.
 
 ### 공개 출시 전 남은 확인
 

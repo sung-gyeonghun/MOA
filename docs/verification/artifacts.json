@@ -1,27 +1,27 @@
 {
-  "verifiedAt": "2026-10-13T11:51:53+09:00",
+  "verifiedAt": "2026-10-13T12:24:52+09:00",
+  "version": "1.0.1",
   "artifacts": [
     {
       "file": "moa-debug.apk",
-      "bytes": 71189595,
-      "sha256": "30ec9abe3a6d9030f8094f3f76a49d1c62c4480f6a8bfa9f24fd83beb9050a75"
+      "bytes": 70167785,
+      "sha256": "1e4fd00cbe65f002eabaf0400638dd99c2744f44ee97d5d32df457fc043d234d"
     },
     {
       "file": "moa-preview.apk",
-      "bytes": 7910791,
-      "sha256": "3228f5818993dbd6d3e75061e03ba70969b444a8e9c71219ed8406db895795ec"
+      "bytes": 7910795,
+      "sha256": "22dead5f0be29082e8f5486f5e8b16f4d00cdb77840f6df0a4cffebcd445f0c5"
     },
     {
       "file": "moa-release-unsigned.aab",
-      "bytes": 8790955,
-      "sha256": "af263ad610b3d71e480e39136ebfe8f5aadf9a40376f9fb2493189997d25ba42"
+      "bytes": 8807140,
+      "sha256": "f20fc283ac7ce9b9560ba66a65fc62296ebfc10b5e339c8689cea847a61addc2"
     },
     {
       "file": "moa-release-unsigned.apk",
-      "bytes": 7898503,
-      "sha256": "7bee76cb185cfb458e74e84d0580e864f8ae7b68b48732d7c73be02291cef1b6"
+      "bytes": 7898507,
+      "sha256": "9baa0300652b006d76392f6398463bdfbadfbd053533f9569108e29a87ab83db"
     }
   ],
-  "archiveIntegrityVerified": true,
-  "revision": "Preview regional pill styling restored; other artifacts from dropdown/month build"
+  "archiveIntegrityVerified": true
 }
