@@ -11,5 +11,10 @@
   "reusedCount": 2766,
   "lastFullSyncAt": "2026-10-13T01:13:54+09:00",
   "scheduledEveryHours": 3,
-  "scheduledTriggerObserved": false
+  "scheduledTriggerObserved": true,
+  "scheduledRun": "https://github.com/sung-gyeonghun/MOA/actions/runs/38328864571",
+  "scheduledRunSucceeded": true,
+  "scheduledUpdatedAt": "2026-10-13T09:52:25+09:00",
+  "scheduledCount": 2934,
+  "scheduledMonthlyHashesVerified": true
 }
