@@ -229,6 +229,10 @@ class MainActivity : ComponentActivity() {
 @Composable fun InfoRow(icon: ImageVector, label: String, value: String) { Row(verticalAlignment = Alignment.Top) { Icon(icon, null, tint = Purple, modifier = Modifier.size(19.dp)); Text(label, color = Muted, fontSize = 12.sp, modifier = Modifier.width(88.dp).padding(start = 10.dp)); Text(value.ifBlank { "정보 없음" }, fontSize = 13.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f)) } }
 
 @Composable fun SettingsScreen(filters: Filters, darkMode: Boolean, changeDarkMode: (Boolean) -> Unit, onFilter: () -> Unit) {
+    var privacyOpen by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val privacy = remember(context) { context.assets.open("privacy_policy.txt").bufferedReader().use { it.readText() } }
+    if (privacyOpen) AlertDialog(onDismissRequest = { privacyOpen = false }, title = { Text("개인정보처리방침") }, text = { Text(privacy, modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), fontSize = 13.sp, lineHeight = 22.sp) }, confirmButton = { TextButton(onClick = { privacyOpen = false }) { Text("닫기") } })
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         Text("나의 모아", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.padding(top = 18.dp))
         Text("취향에 맞게, 더 편안하게.", color = Muted, fontSize = 13.sp)
@@ -247,6 +251,7 @@ class MainActivity : ComponentActivity() {
             Text("기본 지역 · 관심 장르", fontWeight = FontWeight.Bold)
             Text("${filters.regionLabel} · ${filters.genres.joinToString(", ").ifBlank { "전체 장르" }}", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp))
         } }
+        TextButton(onClick = { privacyOpen = true }) { Text("개인정보처리방침") }
         HorizontalDivider(color = Lavender)
         Text("모아 v${BuildConfig.VERSION_NAME}\n공연 정보 출처: (재)예술경영지원센터 KOPIS\n찜과 선호 설정은 이 기기에 저장됩니다.", color = Muted, fontSize = 12.sp, lineHeight = 22.sp)
     }

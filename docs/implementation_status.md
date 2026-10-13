@@ -28,10 +28,12 @@
 
 ## 아직 완료되지 않은 출시 검증
 
-소유자 정식 서명키, 일반 공개/Play 정책 및 콘텐츠 이용 권한 검토. Android 10은 에뮬레이터로 검증했으며 Play 출시를 완료한 상태는 아닙니다.
+소유자 정식 서명키, 실제 Play 제출 시 Data safety 입력과 소유자 최종 정책 확인. Android 10은 에뮬레이터로 검증했으며 Play 출시를 완료한 상태는 아닙니다.
 
 최신 UI: 배너 지역 알약 버튼, 지역·장르 복수 선택 드롭다운, 월 단위 기간 선택, 설정 주소 제거. 변경 검증은 Kotlin 8개·Android 10 연결 13개 통과. `docs/verification/dropdown-month-update.md` 참고.
 
-설치용 Preview APK는 GitHub Release `v1.0.2-preview.1`로 배포하며 README에서 직접 다운로드합니다.
+설치용 Preview APK는 GitHub Release `v1.0.3-preview.1`로 배포하며 README에서 직접 다운로드합니다.
 
 실기기 검증: 사용자가 2026-10-13 검색·상세·예매 링크 열기·찜 후 종료/재실행·비행기 모드 조회 모두 정상이라고 확인했다. 기종·OS·측정 성능은 별도로 수집하지 않았다. 다크모드 저장과 키보드 하단 메뉴 처리는 `appearance-keyboard-tests.xml`에서 확인했다.
+
+최종 추가: 개인정보처리방침을 운영자 성경훈(skh1205@naver.com) 정보와 함께 공개하고 설정에서 오프라인 열람하도록 구현. 데이터 JSON 재배포·제공 포스터 표시 허용은 사용자 확인으로 기록했다. 최신 Debug/Preview/Release APK·AAB 모두 1.0.3으로 빌드했다.

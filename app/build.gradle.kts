@@ -9,7 +9,7 @@ plugins {
 android {
     namespace = "kr.moa.app"
     compileSdk = 35
-    defaultConfig { applicationId = "kr.moa.app"; minSdk = 29; targetSdk = 35; versionCode = 3; versionName = "1.0.2"; testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
+    defaultConfig { applicationId = "kr.moa.app"; minSdk = 29; targetSdk = 35; versionCode = 4; versionName = "1.0.3"; testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
     buildFeatures { compose = true; buildConfig = true }
     buildTypes {
         getByName("release") {
