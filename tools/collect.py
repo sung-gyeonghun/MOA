@@ -13,6 +13,7 @@ import tempfile
 import time
 import uuid
 import hashlib
+from urllib.error import HTTPError
 from urllib.parse import urlencode, urlparse
 from urllib.request import urlopen
 import xml.etree.ElementTree as ET
@@ -25,22 +26,41 @@ GENRES = {"대중음악": "콘서트", "서양음악(클래식)": "클래식", "
 # KOPIS OpenAPI common-code document; the listing response supplies genrenm.
 GENRE_CODES = {"연극": "AAAA", "뮤지컬": "GGGA", "서양음악(클래식)": "CCCA", "한국음악(국악)": "CCCC", "대중음악": "CCCD", "무용(서양/한국무용)": "BBBC", "대중무용": "BBBR", "서커스/마술": "EEEB", "복합": "EEEA"}
 
+def kopis_return_code(result: ET.Element) -> str | None:
+    code = (result.findtext(".//returncode") or "").strip()
+    return code if re.fullmatch(r"[0-9]{2}", code) else None
+
 def request(path: str, key: str, **params) -> ET.Element:
-    # Never log the URL: it contains the service key.
+    # The URL and the error message from KOPIS may contain the service key.
     url = BASE + path + "?" + urlencode({"service": key, **params})
     for attempt in range(6):
+        code = None
         try:
             with urlopen(url, timeout=40) as response:
                 result = ET.fromstring(response.read())
-            if result.tag != "dbs":
-                raise ValueError("Unexpected API response; publication cancelled")
-            time.sleep(.15)
-            return result
+            code = kopis_return_code(result)
+            if result.tag == "dbs" and code in (None, "00"):
+                time.sleep(.15)
+                return result
+            category = "unexpected API response" if code is None else "KOPIS returned an error"
+        except HTTPError as error:
+            category = f"HTTP {error.code}"
+            with error:
+                if attempt == 5:
+                    try:
+                        code = kopis_return_code(ET.fromstring(error.read(8192)))
+                    except (ET.ParseError, OSError, ValueError):
+                        pass
         except Exception as error:
-            if attempt == 5:
-                status = getattr(error, "code", None)
-                category = f"HTTP {status}" if isinstance(status, int) else type(error).__name__
-                raise RuntimeError(f"KOPIS request failed for {path} ({category}); previous publication retained") from None
+            category = type(error).__name__
+        if attempt == 5:
+            context = [category, f"KOPIS returncode={code or 'unavailable'}"]
+            if path == "pblprfr":
+                for name in ("stdate", "eddate", "cpage", "prfstate", "afterdate"):
+                    value = str(params.get(name, ""))
+                    if re.fullmatch(r"[0-9]{1,8}", value) and value != key:
+                        context.append(f"{name}={value}")
+            raise RuntimeError(f"KOPIS request failed for {path} ({', '.join(context)}); previous publication retained") from None
             time.sleep(min(2 ** (attempt + 1), 30))
     raise AssertionError("unreachable")
 

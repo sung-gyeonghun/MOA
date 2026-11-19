@@ -1,10 +1,12 @@
 import importlib.util
+from io import BytesIO
 import json
 from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
 from datetime import date
+from urllib.error import HTTPError
 import xml.etree.ElementTree as ET
 
 spec = importlib.util.spec_from_file_location("collect", Path(__file__).parents[1] / "collect.py")
@@ -85,6 +87,33 @@ class CollectorTests(unittest.TestCase):
             with self.assertRaises(RuntimeError) as failure:
                 collect.request('pblprfr', service_key)
         self.assertNotIn(service_key, str(failure.exception))
+
+    def test_http_400_reports_request_context_and_only_numeric_kopis_code(self):
+        service_key = 'SECRET_NOT_FOR_LOGS'
+        for body, expected_code in (
+            (f'<dbs><db><returncode>01</returncode><errmsg>{service_key}</errmsg></db></dbs>', '01'),
+            (f'<dbs><db><returncode>{service_key}</returncode></db></dbs>', 'unavailable'),
+            (f'<html>Bad request: {service_key}', 'unavailable'),
+        ):
+            with self.subTest(code=expected_code):
+                def reject(url, **kwargs):
+                    raise HTTPError(url, 400, service_key, {}, BytesIO(body.encode()))
+
+                with patch.object(collect, 'urlopen', side_effect=reject), patch.object(collect.time, 'sleep'):
+                    with self.assertRaises(RuntimeError) as failure:
+                        collect.request('pblprfr', service_key, stdate='20261101', eddate='20261130', cpage=3)
+                message = str(failure.exception)
+                for fragment in ('HTTP 400', f'KOPIS returncode={expected_code}', 'stdate=20261101',
+                                 'eddate=20261130', 'cpage=3'):
+                    self.assertIn(fragment, message)
+                self.assertNotIn(service_key, message)
+
+    def test_kopis_error_xml_in_http_success_is_rejected(self):
+        body = b'<dbs><db><returncode>02</returncode><errmsg>secret</errmsg></db></dbs>'
+        with patch.object(collect, 'urlopen', side_effect=lambda *a, **kw: BytesIO(body)), patch.object(collect.time, 'sleep'):
+            with self.assertRaisesRegex(RuntimeError, 'KOPIS returncode=02') as failure:
+                collect.request('pblprfr', 'secret')
+        self.assertNotIn('secret', str(failure.exception))
 
     def test_incremental_reuses_unchanged_and_drops_removed_ids(self):
         item = collect.normalize(self.fixture(), self.fixture())
