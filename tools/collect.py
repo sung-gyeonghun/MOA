@@ -15,11 +15,12 @@ import uuid
 import hashlib
 from urllib.error import HTTPError
 from urllib.parse import urlencode, urlparse
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 import xml.etree.ElementTree as ET
 from zoneinfo import ZoneInfo
 
 BASE = "https://www.kopis.or.kr/openApi/restful/"
+USER_AGENT = "MOA performance collector (+https://github.com/sung-gyeonghun/MOA)"
 REGIONS = {"서울특별시": "서울", "부산광역시": "부산", "대구광역시": "대구", "인천광역시": "인천", "광주광역시": "광주", "대전광역시": "대전", "울산광역시": "울산", "세종특별자치시": "세종", "경기도": "경기", "강원특별자치도": "강원", "강원도": "강원", "충청북도": "충북", "충청남도": "충남", "전북특별자치도": "전북", "전라북도": "전북", "전라남도": "전남", "경상북도": "경북", "경상남도": "경남", "제주특별자치도": "제주"}
 REGIONS.update({"전남광주통합특별시": "전남광주", "광주": "전남광주", "광주광역시": "전남광주", "전남": "전남광주", "전라남도": "전남광주"})
 GENRES = {"대중음악": "콘서트", "서양음악(클래식)": "클래식", "한국음악(국악)": "국악", "무용(서양/한국무용)": "무용", "대중무용": "무용", "서커스/마술": "서커스/마술"}
@@ -33,10 +34,11 @@ def kopis_return_code(result: ET.Element) -> str | None:
 def request(path: str, key: str, **params) -> ET.Element:
     # The URL and the error message from KOPIS may contain the service key.
     url = BASE + path + "?" + urlencode({"service": key, **params})
+    http_request = Request(url, headers={"User-Agent": USER_AGENT})
     for attempt in range(6):
         code = None
         try:
-            with urlopen(url, timeout=40) as response:
+            with urlopen(http_request, timeout=40) as response:
                 result = ET.fromstring(response.read())
             code = kopis_return_code(result)
             if result.tag == "dbs" and code in (None, "00"):

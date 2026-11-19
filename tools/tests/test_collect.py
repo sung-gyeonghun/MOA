@@ -96,8 +96,9 @@ class CollectorTests(unittest.TestCase):
             (f'<html>Bad request: {service_key}', 'unavailable'),
         ):
             with self.subTest(code=expected_code):
-                def reject(url, **kwargs):
-                    raise HTTPError(url, 400, service_key, {}, BytesIO(body.encode()))
+                def reject(request, **kwargs):
+                    self.assertEqual(request.get_header('User-agent'), collect.USER_AGENT)
+                    raise HTTPError(request.full_url, 400, service_key, {}, BytesIO(body.encode()))
 
                 with patch.object(collect, 'urlopen', side_effect=reject), patch.object(collect.time, 'sleep'):
                     with self.assertRaises(RuntimeError) as failure:
