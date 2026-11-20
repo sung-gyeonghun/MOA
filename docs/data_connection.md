@@ -22,6 +22,8 @@
 
 코드가 원격 저장소에 올라간 후 Actions의 `Collect and publish performances`에서 Run workflow를 실행합니다. 테스트 → 수집 → 검증 → 업로드 → Pages 배포 순서입니다. 수집이나 검증이 실패하면 배포 단계로 진행하지 않습니다.
 
+최신 실행에서 `collect`가 성공하고 `deploy`만 실패했다면 해당 실행의 **Re-run failed jobs**로 배포만 재시도할 수 있습니다. 업로드한 파일은 3일간 보관됩니다. 파일이 만료됐다면 **Run workflow**로 다시 수집합니다.
+
 배포 결과의 URL에서 `manifest.json`을 확인합니다. 예상 주소는 `https://sung-gyeonghun.github.io/MOA/`이지만 실제 주소는 Actions 배포 결과가 기준입니다.
 
 ## 4. 앱 연결
