@@ -5,15 +5,18 @@ import argparse
 import calendar
 from datetime import date, datetime, timedelta
 import json
+import logging
 import os
 from pathlib import Path
 import re
 import shutil
+import socket
+import ssl
 import tempfile
 import time
 import uuid
 import hashlib
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlparse
 from urllib.request import Request, urlopen
 import xml.etree.ElementTree as ET
@@ -31,11 +34,31 @@ def kopis_return_code(result: ET.Element) -> str | None:
     code = (result.findtext(".//returncode") or "").strip()
     return code if re.fullmatch(r"[0-9]{2}", code) else None
 
+def connection_error_summary(error: OSError) -> str:
+    # Exception messages and string-valued URL errors can include the request URL.
+    wrapped = isinstance(error, URLError)
+    reason = error.reason if wrapped else error
+    for error_type in (
+        TimeoutError, socket.gaierror, socket.herror, ssl.SSLCertVerificationError,
+        ssl.SSLError, ConnectionRefusedError, ConnectionResetError, ConnectionAbortedError,
+        ConnectionError, OSError,
+    ):
+        if isinstance(reason, error_type):
+            summary = error_type.__name__
+            if type(reason.errno) is int:
+                summary += f", errno={reason.errno}"
+            break
+    else:
+        summary = "unknown"
+    return f"URLError, reason={summary}" if wrapped else summary
+
+
 def request(path: str, key: str, **params) -> ET.Element:
     # The URL and the error message from KOPIS may contain the service key.
     url = BASE + path + "?" + urlencode({"service": key, **params})
     http_request = Request(url, headers={"User-Agent": USER_AGENT})
-    for attempt in range(6):
+    max_attempts = 6
+    for attempt in range(1, max_attempts + 1):
         code = None
         try:
             with urlopen(http_request, timeout=40) as response:
@@ -48,14 +71,19 @@ def request(path: str, key: str, **params) -> ET.Element:
         except HTTPError as error:
             category = f"HTTP {error.code}"
             with error:
-                if attempt == 5:
+                if attempt == max_attempts:
                     try:
                         code = kopis_return_code(ET.fromstring(error.read(8192)))
                     except (ET.ParseError, OSError, ValueError):
                         pass
+        except OSError as error:
+            category = connection_error_summary(error)
+            if attempt < max_attempts:
+                logging.warning("KOPIS connection failure for %s (attempt %d/%d): %s",
+                                path, attempt, max_attempts, category)
         except Exception as error:
             category = type(error).__name__
-        if attempt == 5:
+        if attempt == max_attempts:
             context = [category, f"KOPIS returncode={code or 'unavailable'}"]
             if path == "pblprfr":
                 for name in ("stdate", "eddate", "cpage", "prfstate", "afterdate"):
@@ -63,7 +91,7 @@ def request(path: str, key: str, **params) -> ET.Element:
                     if re.fullmatch(r"[0-9]{1,8}", value) and value != key:
                         context.append(f"{name}={value}")
             raise RuntimeError(f"KOPIS request failed for {path} ({', '.join(context)}); previous publication retained") from None
-            time.sleep(min(2 ** (attempt + 1), 30))
+        time.sleep(min(2 ** attempt, 30))
     raise AssertionError("unreachable")
 
 def field(node: ET.Element, name: str, fallback: str = "") -> str:

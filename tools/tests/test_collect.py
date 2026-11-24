@@ -2,11 +2,14 @@ import importlib.util
 from io import BytesIO
 import json
 from pathlib import Path
+import socket
+import ssl
 import tempfile
 import unittest
 from unittest.mock import patch
 from datetime import date
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
+from urllib.parse import quote_plus
 import xml.etree.ElementTree as ET
 
 spec = importlib.util.spec_from_file_location("collect", Path(__file__).parents[1] / "collect.py")
@@ -81,12 +84,42 @@ class CollectorTests(unittest.TestCase):
             with self.assertRaises(ValueError): collect.check_output(root)
             self.assertEqual((root / 'personal-note.txt').read_text(), 'keep')
 
-    def test_api_failure_does_not_print_service_key(self):
-        service_key = 'SECRET_NOT_FOR_LOGS'
-        with patch.object(collect, 'urlopen', side_effect=OSError(service_key)), patch.object(collect.time, 'sleep'):
+    def test_connection_failures_wait_between_attempts_and_do_not_log_service_key(self):
+        service_key = 'SECRET + NOT FOR LOGS'
+        attempts = []
+
+        def fail(request, **kwargs):
+            attempts.append('request')
+            raise URLError(socket.gaierror(socket.EAI_AGAIN, request.full_url))
+
+        with (patch.object(collect, 'urlopen', side_effect=fail),
+              patch.object(collect.time, 'sleep', side_effect=attempts.append),
+              self.assertLogs(level='WARNING') as logs):
             with self.assertRaises(RuntimeError) as failure:
                 collect.request('pblprfr', service_key)
-        self.assertNotIn(service_key, str(failure.exception))
+
+        self.assertEqual(attempts, ['request', 2, 'request', 4, 'request', 8,
+                                    'request', 16, 'request', 30, 'request'])
+        self.assertEqual(len(logs.output), 5)
+        for message in [*logs.output, str(failure.exception)]:
+            self.assertIn(f'URLError, reason=gaierror, errno={socket.EAI_AGAIN}', message)
+            self.assertNotIn(service_key, message)
+            self.assertNotIn(quote_plus(service_key), message)
+            self.assertNotIn('https://', message)
+
+    def test_connection_error_summary_only_uses_safe_fields(self):
+        sensitive = 'https://example.com/?service=SECRET'
+        for error, expected in (
+            (TimeoutError(sensitive), 'TimeoutError'),
+            (URLError(ssl.SSLCertVerificationError(1, sensitive)),
+             'URLError, reason=SSLCertVerificationError, errno=1'),
+            (URLError(ConnectionResetError(104, sensitive)),
+             'URLError, reason=ConnectionResetError, errno=104'),
+            (URLError(sensitive), 'URLError, reason=unknown'),
+            (OSError(sensitive), 'OSError'),
+        ):
+            with self.subTest(expected=expected):
+                self.assertEqual(collect.connection_error_summary(error), expected)
 
     def test_http_400_reports_request_context_and_only_numeric_kopis_code(self):
         service_key = 'SECRET_NOT_FOR_LOGS'
